@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <style>
-  /* Layout: a quiet daily ledger that is taken over by a full cobalt poster when it is time to start. */
+  /* Layout: a quiet daily ledger led by one cobalt start card; a running timer takes over the screen. */
   :root {
     --bg: #e9edf5; --surface: #f7f9fc; --ink: #131a2e; --muted: #586079; --line: #c9d1e0;
     --accent: #1f3fd6; --on-accent: #ffffff;
@@ -64,7 +64,6 @@
 
   .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
   .row:last-child { border-bottom: 1px solid var(--line); }
-  .when { width: 3.2rem; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 14px; }
   .name { flex: 1 1 8rem; min-width: 0; }
   .name strong { display: block; font-weight: 700; }
   .name small { display: block; color: var(--muted); font-size: 13px; }
@@ -91,8 +90,8 @@
   details[open] summary::before { content: "▾"; }
   summary::-webkit-details-marker { display: none; }
   .settings { display: grid; gap: 14px; margin-top: 4px; }
-  .habit { display: grid; grid-template-columns: 6rem 7rem minmax(0, 1fr); gap: 6px; }
-  .numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
+  .habit { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 6px; }
+  .numbers { display: grid; grid-template-columns: minmax(0, 10rem); gap: 10px; }
   .help { color: var(--muted); font-size: 14px; margin: 8px 0 0; max-width: 62ch; }
   .notice { color: var(--danger); font-size: 14px; margin: 0; }
   .saved { color: var(--muted); font-size: 14px; }
@@ -108,16 +107,21 @@
     padding: calc(24px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px)); }
   .poster { width: 100%; max-width: 44rem; margin: 0 auto; display: grid; gap: 8px; justify-items: start; }
   .eyebrow { color: var(--on-flood-muted); font-size: 1.05rem; }
+  .hero { display: grid; gap: 4px; justify-items: start; padding: 20px; border-radius: 8px; background: var(--flood); color: var(--on-flood); }
+  .hero-label { color: var(--on-flood-muted); font-size: 14px; }
+  .hero-name { font-family: var(--display); font-size: clamp(2.6rem, 11vw, 4rem); line-height: 1.1; overflow-wrap: anywhere; }
+  .hero-step { font-weight: 700; font-size: 1.1rem; text-wrap: balance; }
+  .hero-note { color: var(--on-flood-muted); font-size: 14px; }
+  .hero button { margin-top: 12px; min-height: 56px; padding: 12px 32px; background: var(--on-flood); color: #1f3fd6;
+    box-shadow: none; font-size: 1.2rem; font-weight: 700; }
+  .hero button:focus-visible { outline-color: var(--on-flood); }
   .big { font-family: var(--display); font-size: clamp(4.5rem, 20vw, 10rem); line-height: 1.05; word-break: keep-all; overflow-wrap: anywhere; }
-  .big.long { font-size: clamp(2.6rem, 11vw, 5.5rem); }
-  .big.phrase { font-size: clamp(2.2rem, 8vw, 4rem); }
   .step { font-size: clamp(1.25rem, 4vw, 1.7rem); font-weight: 700; text-wrap: balance; }
   .small { color: var(--on-flood-muted); }
   .flood button { box-shadow: inset 0 0 0 1px var(--on-flood-muted); color: var(--on-flood); }
   .flood button.go { background: var(--on-flood); color: #1f3fd6; box-shadow: none; font-size: 1.35rem; font-weight: 700; padding: 16px 32px; margin-top: 14px; }
-  .flood button.go:focus-visible, .flood button:focus-visible, .flood input:focus-visible { outline-color: var(--on-flood); }
+  .flood button.go:focus-visible, .flood button:focus-visible { outline-color: var(--on-flood); }
   .flood .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-  .flood input { max-width: 22rem; background: transparent; color: var(--on-flood); border-color: var(--on-flood-muted); font-size: 1.1rem; margin-top: 8px; }
   .clock { font-family: var(--display); font-size: clamp(4rem, 24vw, 13rem); line-height: 1; font-variant-numeric: tabular-nums; }
 
   /* 터치 기기에서는 PC 전용 알림 안내를 숨긴다. */
@@ -131,8 +135,7 @@
     .flood button.go { width: 100%; margin-top: auto; min-height: 60px; }
     .flood .buttons { display: flex; margin-top: 2px; }
     .flood .buttons button { flex: 1 1 40%; }
-    .flood .buttons .snooze { flex-basis: 100%; }
-    .flood input { max-width: none; }
+    .flood .buttons.end { margin-top: auto; }
   }
 
   /* 휴대폰 가로: 내용과 버튼을 좌우로 나눈다. */
@@ -142,14 +145,11 @@
     .poster > * { grid-column: 1; }
     .eyebrow { font-size: .95rem; }
     .big { font-size: clamp(2.6rem, 22vh, 5rem); }
-    .big.long, .big.phrase { font-size: clamp(1.7rem, 12vh, 3rem); }
     .step { font-size: 1.1rem; }
     .clock { font-size: clamp(3.5rem, 34vh, 7rem); }
-    .flood input { margin-top: 2px; }
     .flood button.go { grid-column: 2; grid-row: 1 / span 3; align-self: end; width: 100%; margin-top: 0; padding: 12px; font-size: 1.15rem; }
     .flood .buttons { grid-column: 2; grid-row: 4 / span 3; align-self: start; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
     .flood .buttons button { padding-inline: 6px; font-size: 14px; }
-    .flood .buttons .snooze { grid-column: 1 / -1; }
     .flood .buttons button:only-child { grid-column: 1 / -1; }
   }
 
@@ -157,12 +157,11 @@
   @media (max-width: 30rem) {
     .page { gap: 26px; }
     .row { gap: 8px 10px; }
-    .when { width: auto; }
     .actions { flex: 1 1 100%; }
     .actions button { flex: 1 1 0; }
     .row .stamp { margin-left: auto; }
-    .habit { grid-template-columns: 1fr 1fr; }
-    .habit .wide { grid-column: 1 / -1; }
+    .habit { grid-template-columns: minmax(0, 1fr); }
+    .hero button { width: 100%; }
     .settings .actions { flex-wrap: wrap; }
     .settings .actions button { flex: 1 1 100%; }
     #saveSettings, #disconnect, #localOnly, .linkbutton { width: 100%; justify-content: center; }
@@ -181,6 +180,7 @@
     <span class="date" id="date"></span>
     <p class="next" id="next">기록을 불러오는 중입니다.</p>
   </header>
+  <section class="hero" id="hero" aria-label="다음 할 일" hidden></section>
   <p class="notice" id="notice" hidden></p>
   <section class="connect" id="connectBox" hidden aria-labelledby="connectTitle">
     <h2 id="connectTitle">PC와 휴대폰 기록 연결</h2>
@@ -205,7 +205,7 @@
   </section>
   <section id="alertSection">
     <button id="soundButton" type="button">알림 켜기</button>
-    <p class="help" id="soundHelp">PC에서 켜 두면 페이지가 뒤에 있어도 Windows 알림으로 알려 줍니다.</p>
+    <p class="help" id="soundHelp">켜 두면 타이머가 끝났을 때 Windows 알림으로 알려 줍니다.</p>
   </section>
   <details id="settingsBox">
     <summary>설정</summary>
@@ -217,8 +217,6 @@
       </div>
       <div class="numbers">
         <label>타이머(분)<input id="startMinutes" type="number" inputmode="numeric" min="1" max="60" required></label>
-        <label>미루기 간격(분)<input id="snoozeMinutes" type="number" inputmode="numeric" min="1" max="240" required></label>
-        <label>하루 미루기 횟수<input id="maxSnoozes" type="number" inputmode="numeric" min="0" max="5" required></label>
       </div>
       <div class="actions">
         <button class="solid" type="submit" id="saveSettings">저장</button>
@@ -232,11 +230,11 @@
 <script>
 (() => {
   const DEFAULTS = {
-    startMinutes: 2, snoozeMinutes: 30, maxSnoozes: 2, gapMinutes: 20,
+    startMinutes: 2,
     habits: [
-      { id: "study", name: "공부", time: "14:00", firstStep: "책 펴고 한 문단만 읽기" },
-      { id: "exercise", name: "운동", time: "18:00", firstStep: "운동복 입고 스쿼트 5개" },
-      { id: "clean", name: "청소", time: "21:00", firstStep: "눈에 보이는 물건 3개 제자리에 두기" },
+      { id: "study", name: "공부", firstStep: "책 펴고 한 문단만 읽기" },
+      { id: "exercise", name: "운동", firstStep: "운동복 입고 스쿼트 5개" },
+      { id: "clean", name: "청소", firstStep: "눈에 보이는 물건 3개 제자리에 두기" },
     ],
   };
   const MINUTE = 60000, DAY_START_HOUR = 4, DAY_MS = 86400000;
@@ -249,27 +247,17 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
   const isFinished = (entry) => entry?.status === "done" || entry?.status === "skipped";
-  function dueHabit(ms) {
-    const now = new Date(ms);
-    const clock = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    const afterMidnight = now.getHours() < DAY_START_HOUR;
-    const today = days[dayKey(ms)] ?? {};
-    return [...config.habits].sort((a, b) => a.time.localeCompare(b.time))
-      .find((h) => (afterMidnight || clock >= h.time) && !isFinished(today[h.id])) ?? null;
-  }
   function missedYesterday(ms, id) {
     const today = dayKey(ms);
     if (!Object.keys(days).some((day) => day < today)) return false;
     return days[dayKey(ms - DAY_MS)]?.[id]?.status !== "done";
   }
-  const skipPhrase = (name) => `오늘 ${name} 안 한다`;
-  const squash = (text) => text.replace(/\s+/g, "");
   const durationText = (m) => (m >= 1 ? `${m}분` : `${Math.round(m * 60)}초`);
   const clockText = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
 
   // ---------- 상태와 저장 ----------
   let config = DEFAULTS, days = {}, session = {};
-  let appReady = false, daysReady = false, skipping = false, ticker = null, stageKey = "", settingsFilled = false;
+  let appReady = false, daysReady = false, ticker = null, stageKey = "", settingsFilled = false;
   let queue = Promise.resolve();
 
   function showNotice(text) {
@@ -289,7 +277,6 @@
   }
   const entryOf = (id, ms = Date.now()) => days[dayKey(ms)]?.[id] ?? {};
   const currentHabit = () => config.habits.find((h) => h.id === session.habitId);
-  const quiet = (minutes) => ({ phase: null, quietUntil: Date.now() + minutes * MINUTE });
 
   // ---------- 알림 ----------
   let audio = null;
@@ -335,47 +322,23 @@
     setSession({ phase: "done" });
     alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
   }
-  function snooze() {
-    const entry = entryOf(session.habitId);
-    if ((entry.snoozes ?? 0) >= config.maxSnoozes) return;
-    setEntry(session.habitId, { snoozes: (entry.snoozes ?? 0) + 1 });
-    setSession(quiet(config.snoozeMinutes));
-  }
-  function trySkip(text, errorNode) {
-    const habit = currentHabit();
-    if (squash(text) !== squash(skipPhrase(habit.name))) {
-      errorNode.textContent = "문장이 달라요. 위 문장을 그대로 입력하세요.";
-      return;
-    }
-    setEntry(habit.id, { status: "skipped" });
-    skipping = false;
-    setSession(quiet(config.gapMinutes));
-  }
   function finishExtra() {
     const entry = entryOf(session.habitId);
     const added = Math.round((Date.now() - session.startedAt) / MINUTE);
     setEntry(session.habitId, { minutes: (entry.minutes ?? 0) + added });
-    setSession(quiet(config.gapMinutes));
+    setSession({ phase: null });
   }
   function markDone(habitId) {
     setEntry(habitId, { status: "done", minutes: Math.max(1, Math.round(config.startMinutes)) });
-    if (session.habitId === habitId && session.phase === "prompt") setSession(quiet(config.gapMinutes));
-    else render();
+    render();
   }
 
-  // 시간이 되었는지 확인한다. 상태가 바뀔 때만 저장한다.
+  // 타이머가 끝났는지 확인하고, 어제 남은 화면이나 이전 버전의 자동 화면을 닫는다.
   function check() {
-    if (!appReady || !daysReady || !(token || localOnly)) return;
+    if (!appReady || !daysReady) return;
     const now = Date.now();
     if (session.phase === "timer" && now >= session.finishAt) completeTimer();
-    if (session.phase && (session.day !== dayKey(now) || !currentHabit())) setSession({ phase: null });
-    if (session.phase === "prompt" && isFinished(entryOf(session.habitId))) setSession({ phase: null });
-    if (session.phase || now < (session.quietUntil ?? 0)) return;
-    const habit = dueHabit(now);
-    if (habit) {
-      setSession({ habitId: habit.id, phase: "prompt", day: dayKey(now) });
-      alertUser(`지금 할 일: ${habit.name}. ${habit.firstStep}`);
-    }
+    if (session.phase && (session.phase === "prompt" || session.day !== dayKey(now) || !currentHabit())) setSession({ phase: null });
   }
 
   // ---------- 화면 ----------
@@ -392,53 +355,16 @@
     return node;
   }
 
-  function promptView(habit) {
-    const poster = el("div", "poster");
-    const now = Date.now();
-    const duration = durationText(config.startMinutes);
-    poster.append(el("div", "eyebrow", "지금 할 일"), el("div", `big${habit.name.length > 4 ? " long" : ""}`, habit.name), el("div", "step", habit.firstStep),
-      el("div", "small", `${duration}만 하면 오늘은 성공입니다.`));
-    if (missedYesterday(now, habit.id)) poster.append(el("div", "small", "어제 빠져도 괜찮아요. 오늘 하면 다시 이어집니다."));
-    poster.append(btn(`${duration}만 시작`, "go", () => startTimer(habit.id)));
-    const buttons = el("div", "buttons");
-    const left = config.maxSnoozes - (entryOf(habit.id).snoozes ?? 0);
-    if (left > 0) buttons.append(btn(`${config.snoozeMinutes}분 뒤에 (오늘 ${left}번 남음)`, "snooze", snooze));
-    buttons.append(btn("이미 했어요", "", () => markDone(habit.id)),
-      btn("오늘은 안 할래요", "", () => { skipping = true; render(); }));
-    poster.append(buttons);
-    return poster;
-  }
-
-  function skipView(habit) {
-    const poster = el("div", "poster");
-    const phrase = skipPhrase(habit.name);
-    const field = el("input");
-    field.id = "skipPhrase";
-    field.setAttribute("aria-label", "건너뛰기 문장 입력");
-    field.autocomplete = "off";
-    field.enterKeyHint = "done";
-    const error = el("div", "small", " ");
-    error.setAttribute("role", "status");
-    field.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" && !event.isComposing) trySkip(field.value, error);
-    });
-    const buttons = el("div", "buttons");
-    buttons.append(btn("건너뛰기", "", () => trySkip(field.value, error)));
-    poster.append(el("div", "eyebrow", "정말 건너뛸 거라면 아래 문장을 그대로 입력하세요."),
-      el("div", "big phrase", phrase), field, error,
-      btn("돌아가기", "go", () => { skipping = false; render(); }), buttons);
-    if (matchMedia("(pointer: fine)").matches) queueMicrotask(() => field.focus()); // 휴대폰은 키보드가 문장을 가리지 않게 눌러서 연다.
-    return poster;
-  }
-
   function timerView(habit) {
     const poster = el("div", "poster");
     const clock = el("div", "clock");
     const paint = () => { clock.textContent = clockText(Math.max(0, Math.ceil((session.finishAt - Date.now()) / 1000))); };
     paint();
     ticker = setInterval(() => { paint(); if (Date.now() >= session.finishAt) check(); }, 250);
+    const buttons = el("div", "buttons end");
+    buttons.append(btn("취소", "", () => setSession({ phase: null })));
     poster.append(el("div", "eyebrow", habit.name), clock, el("div", "step", habit.firstStep),
-      el("div", "small", "끝나면 알림으로 알려 줍니다. 이 탭을 닫아도 기록은 이어집니다."));
+      el("div", "small", "이 시간만 하면 오늘은 성공입니다."), buttons);
     return poster;
   }
 
@@ -447,7 +373,7 @@
     poster.append(el("div", "big", "성공"), el("div", "step", `오늘 ${habit.name} 칸이 채워졌습니다.`),
       btn("더 할래", "go", () => setSession({ phase: "extra", startedAt: Date.now() })));
     const buttons = el("div", "buttons");
-    buttons.append(btn("여기서 끝", "", () => setSession(quiet(config.gapMinutes))));
+    buttons.append(btn("여기서 끝", "", () => setSession({ phase: null })));
     poster.append(buttons);
     return poster;
   }
@@ -465,16 +391,14 @@
   function renderStage() {
     const habit = currentHabit();
     const phase = habit ? session.phase : null;
-    if (phase !== "prompt") skipping = false;
-    const key = JSON.stringify([phase, habit, skipping, session.finishAt, session.startedAt, entryOf(session.habitId).snoozes,
-      config.startMinutes, config.snoozeMinutes, config.maxSnoozes]);
+    const key = JSON.stringify([phase, habit, session.finishAt, session.startedAt, config.startMinutes]);
     if (key === stageKey) return;
     stageKey = key;
     clearInterval(ticker);
     $("stage").replaceChildren();
     $("home").inert = Boolean(phase);
     if (!phase) return;
-    const view = { prompt: skipping ? skipView : promptView, timer: timerView, done: doneView, extra: extraView }[phase];
+    const view = { timer: timerView, done: doneView, extra: extraView }[phase];
     if (!view) return;
     const flood = el("div", "flood");
     flood.append(view(habit));
@@ -483,11 +407,11 @@
 
   function renderToday(now) {
     const today = days[dayKey(now)] ?? {};
-    const rows = [...config.habits].sort((a, b) => a.time.localeCompare(b.time)).map((habit) => {
+    const rows = config.habits.map((habit) => {
       const row = el("div", "row");
       const name = el("div", "name");
       name.append(el("strong", "", habit.name), el("small", "", habit.firstStep));
-      row.append(el("span", "when", habit.time), name);
+      row.append(name);
       const status = today[habit.id]?.status;
       if (status) row.append(el("span", `stamp ${status}`, status === "done" ? "완료" : "건너뜀"));
       else {
@@ -498,13 +422,24 @@
       return row;
     });
     $("today").replaceChildren(...rows);
-    const waiting = config.habits.filter((h) => !isFinished(today[h.id])).sort((a, b) => a.time.localeCompare(b.time));
-    if (!waiting.length) $("next").textContent = "오늘 할 일을 모두 마쳤습니다.";
-    else {
-      const next = waiting[0];
-      const late = dueHabit(now)?.id === next.id;
-      $("next").textContent = late ? `${next.name} 시간이 지났습니다.` : `다음은 ${next.time} ${next.name}입니다.`;
-    }
+
+    const waiting = config.habits.filter((h) => !isFinished(today[h.id]));
+    const finished = config.habits.length - waiting.length;
+    $("next").textContent = waiting.length
+      ? (finished ? `${config.habits.length}개 중 ${finished}개를 마쳤습니다.` : "언제든 시작할 수 있습니다.")
+      : "오늘 할 일을 모두 마쳤습니다.";
+    renderHero(waiting[0], now);
+  }
+
+  function renderHero(habit, now) {
+    const hero = $("hero");
+    hero.hidden = !habit;
+    if (!habit) { hero.replaceChildren(); return; }
+    const duration = durationText(config.startMinutes);
+    const nodes = [el("div", "hero-label", "다음 할 일"), el("div", "hero-name", habit.name), el("div", "hero-step", habit.firstStep)];
+    if (missedYesterday(now, habit.id)) nodes.push(el("div", "hero-note", "어제 빠져도 괜찮아요. 오늘 하면 다시 이어집니다."));
+    nodes.push(btn(`${duration}만 시작`, "", () => startTimer(habit.id)));
+    hero.replaceChildren(...nodes);
   }
 
   function renderMonth(now) {
@@ -538,11 +473,11 @@
     const rows = config.habits.map((h) => {
       const row = el("div", "habit");
       row.dataset.id = h.id;
-      [["name", "text", h.name, "이름", ""], ["time", "time", h.time, "시작 시간", ""], ["firstStep", "text", h.firstStep, "첫 단계", "wide"]]
-        .forEach(([key, type, value, label, cls]) => {
-          const input = el("input", cls);
+      [["name", h.name, "이름"], ["firstStep", h.firstStep, "첫 단계"]]
+        .forEach(([key, value, label]) => {
+          const input = el("input");
           input.id = `${h.id}-${key}`;
-          input.type = type;
+          input.type = "text";
           input.value = value;
           input.required = true;
           input.dataset.key = key;
@@ -552,7 +487,7 @@
       return row;
     });
     $("habitFields").replaceChildren(...rows);
-    ["startMinutes", "snoozeMinutes", "maxSnoozes"].forEach((id) => { $(id).value = config[id]; });
+    $("startMinutes").value = config.startMinutes;
   }
 
   function render() {
@@ -567,10 +502,9 @@
     event.preventDefault();
     const habits = [...document.querySelectorAll(".habit")].map((row) => {
       const value = (key) => row.querySelector(`[data-key=${key}]`).value.trim();
-      return { id: row.dataset.id, name: value("name"), time: value("time"), firstStep: value("firstStep") };
+      return { id: row.dataset.id, name: value("name"), firstStep: value("firstStep") };
     });
-    config = { ...config, habits, startMinutes: Number($("startMinutes").value),
-      snoozeMinutes: Number($("snoozeMinutes").value), maxSnoozes: Number($("maxSnoozes").value) };
+    config = { ...config, habits, startMinutes: Number($("startMinutes").value) };
     put("app/config", config);
     $("savedMessage").textContent = "저장했습니다.";
     render();
