@@ -4,9 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>일단</title>
+<meta name="theme-color" content="#e9edf5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1424" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="일단">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon128.png">
-<link rel="apple-touch-icon" href="icon128.png">
+<link rel="apple-touch-icon" href="icon180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <style>
@@ -33,16 +39,22 @@
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55;
+    word-break: keep-all; overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
+  body:has(.flood) { overflow: hidden; }
   button, input { font: inherit; color: inherit; }
-  button { cursor: pointer; border: 0; border-radius: 6px; padding: 9px 14px; min-height: 42px; font-weight: 500;
-    background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+  button { cursor: pointer; border: 0; border-radius: 6px; padding: 9px 14px; min-height: 44px; font-weight: 500;
+    background: transparent; box-shadow: inset 0 0 0 1px var(--line); touch-action: manipulation; }
+  button:active { opacity: .75; }
   button.solid { background: var(--accent); color: var(--on-accent); box-shadow: none; font-weight: 700; }
   button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  input { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--surface); font-size: 16px; } /* 16px 미만이면 아이폰이 입력 시 화면을 확대한다. */
   label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 
-  .page { max-width: 44rem; margin: 0 auto; padding-block: 28px 56px; display: grid; gap: 32px;
+  .page { max-width: 44rem; margin: 0 auto; display: grid; gap: 32px;
+    padding-block: calc(28px + env(safe-area-inset-top, 0px)) calc(56px + env(safe-area-inset-bottom, 0px));
     padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px; }
   .brand { font-family: var(--display); font-size: 1.75rem; margin: 0; font-weight: 400; }
@@ -73,26 +85,31 @@
   .day.today { box-shadow: inset 0 0 0 2px var(--accent); color: var(--ink); font-weight: 700; }
   .pips { display: flex; gap: 2px; }
 
-  details { border-top: 1px solid var(--line); padding-top: 12px; }
-  summary { cursor: pointer; color: var(--muted); }
-  .settings { display: grid; gap: 14px; margin-top: 14px; }
+  details { border-top: 1px solid var(--line); padding-top: 2px; }
+  summary { cursor: pointer; color: var(--muted); min-height: 44px; display: flex; align-items: center; gap: 8px; }
+  summary::before { content: "▸"; }
+  details[open] summary::before { content: "▾"; }
+  summary::-webkit-details-marker { display: none; }
+  .settings { display: grid; gap: 14px; margin-top: 4px; }
   .habit { display: grid; grid-template-columns: 6rem 7rem minmax(0, 1fr); gap: 6px; }
-  .numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
   .help { color: var(--muted); font-size: 14px; margin: 8px 0 0; max-width: 62ch; }
   .notice { color: var(--danger); font-size: 14px; margin: 0; }
   .saved { color: var(--muted); font-size: 14px; }
-  a { color: var(--accent); }
   .connect { display: grid; gap: 8px; padding: 14px; background: var(--surface); border-radius: 6px; }
   .connect-row { display: flex; gap: 8px; }
+  .connect-links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .linkbutton { display: inline-flex; align-items: center; min-height: 44px; padding: 9px 14px; border-radius: 6px; font-weight: 500;
+    color: var(--accent); text-decoration: none; box-shadow: inset 0 0 0 1px var(--accent); touch-action: manipulation; }
+  .linkbutton:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
-  .sound { font-size: 14px; color: var(--muted); }
-
-  .flood { position: fixed; inset: 0; z-index: 5; overflow: auto; background: var(--flood); color: var(--on-flood);
-    display: grid; align-content: center; justify-items: start;
+  .flood { position: fixed; inset: 0; z-index: 5; overflow: auto; overscroll-behavior: contain; background: var(--flood); color: var(--on-flood);
+    display: grid; align-content: safe center; justify-items: start;
     padding: calc(24px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px)); }
   .poster { width: 100%; max-width: 44rem; margin: 0 auto; display: grid; gap: 8px; justify-items: start; }
   .eyebrow { color: var(--on-flood-muted); font-size: 1.05rem; }
-  .big { font-family: var(--display); font-size: clamp(4.5rem, 20vw, 10rem); line-height: 1.05; }
+  .big { font-family: var(--display); font-size: clamp(4.5rem, 20vw, 10rem); line-height: 1.05; word-break: keep-all; overflow-wrap: anywhere; }
+  .big.long { font-size: clamp(2.6rem, 11vw, 5.5rem); }
   .big.phrase { font-size: clamp(2.2rem, 8vw, 4rem); }
   .step { font-size: clamp(1.25rem, 4vw, 1.7rem); font-weight: 700; text-wrap: balance; }
   .small { color: var(--on-flood-muted); }
@@ -101,12 +118,57 @@
   .flood button.go:focus-visible, .flood button:focus-visible, .flood input:focus-visible { outline-color: var(--on-flood); }
   .flood .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .flood input { max-width: 22rem; background: transparent; color: var(--on-flood); border-color: var(--on-flood-muted); font-size: 1.1rem; margin-top: 8px; }
-  .clock { font-family: var(--display); font-size: clamp(5.5rem, 26vw, 13rem); line-height: 1; font-variant-numeric: tabular-nums; }
+  .clock { font-family: var(--display); font-size: clamp(4rem, 24vw, 13rem); line-height: 1; font-variant-numeric: tabular-nums; }
 
+  /* 터치 기기에서는 PC 전용 알림 안내를 숨긴다. */
+  @media (pointer: coarse) { #alertSection { display: none; } }
+
+  /* 휴대폰 세로: 내용은 위, 버튼은 엄지가 닿는 아래. */
+  @media (max-width: 40rem) and (min-height: 30.01rem) {
+    .flood { display: flex; flex-direction: column; align-items: stretch; }
+    .poster { flex: 1 0 auto; display: flex; flex-direction: column; align-items: stretch; max-width: none; }
+    .poster > :first-child { margin-top: 12vh; }
+    .flood button.go { width: 100%; margin-top: auto; min-height: 60px; }
+    .flood .buttons { display: flex; margin-top: 2px; }
+    .flood .buttons button { flex: 1 1 40%; }
+    .flood .buttons .snooze { flex-basis: 100%; }
+    .flood input { max-width: none; }
+  }
+
+  /* 휴대폰 가로: 내용과 버튼을 좌우로 나눈다. */
+  @media (max-height: 30rem) {
+    .flood { padding-block: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); }
+    .poster { max-width: none; grid-template-columns: minmax(0, 1fr) minmax(0, 15rem); column-gap: 20px; align-items: center; row-gap: 2px; }
+    .poster > * { grid-column: 1; }
+    .eyebrow { font-size: .95rem; }
+    .big { font-size: clamp(2.6rem, 22vh, 5rem); }
+    .big.long, .big.phrase { font-size: clamp(1.7rem, 12vh, 3rem); }
+    .step { font-size: 1.1rem; }
+    .clock { font-size: clamp(3.5rem, 34vh, 7rem); }
+    .flood input { margin-top: 2px; }
+    .flood button.go { grid-column: 2; grid-row: 1 / span 3; align-self: end; width: 100%; margin-top: 0; padding: 12px; font-size: 1.15rem; }
+    .flood .buttons { grid-column: 2; grid-row: 4 / span 3; align-self: start; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
+    .flood .buttons button { padding-inline: 6px; font-size: 14px; }
+    .flood .buttons .snooze { grid-column: 1 / -1; }
+    .flood .buttons button:only-child { grid-column: 1 / -1; }
+  }
+
+  /* 좁은 화면의 홈과 설정. */
   @media (max-width: 30rem) {
+    .page { gap: 26px; }
+    .row { gap: 8px 10px; }
+    .when { width: auto; }
+    .actions { flex: 1 1 100%; }
+    .actions button { flex: 1 1 0; }
+    .row .stamp { margin-left: auto; }
     .habit { grid-template-columns: 1fr 1fr; }
     .habit .wide { grid-column: 1 / -1; }
-    .when { width: auto; }
+    .settings .actions { flex-wrap: wrap; }
+    .settings .actions button { flex: 1 1 100%; }
+    #saveSettings, #disconnect, #localOnly, .linkbutton { width: 100%; justify-content: center; }
+    #connectButton { flex: none; }
+    .connect-links { display: grid; }
+    label { font-size: 12px; }
   }
 </style>
 </head>
@@ -122,12 +184,15 @@
   <p class="notice" id="notice" hidden></p>
   <section class="connect" id="connectBox" hidden aria-labelledby="connectTitle">
     <h2 id="connectTitle">PC와 휴대폰 기록 연결</h2>
-    <p class="help">연결하지 않으면 이 브라우저에만 기록됩니다. <a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=ildan" target="_blank" rel="noopener">GitHub 토큰 만들기</a>에서 gist 권한만 체크된 토큰을 만들어 붙여 넣으세요. 토큰은 이 기기의 브라우저에만 저장됩니다.</p>
+    <p class="help">연결하지 않으면 이 브라우저에만 기록됩니다. gist 권한만 체크된 GitHub 토큰을 붙여 넣으세요. 토큰은 이 기기의 브라우저에만 저장됩니다.</p>
     <div class="connect-row">
-      <input id="tokenInput" type="password" autocomplete="off" aria-label="GitHub 토큰" placeholder="ghp_...">
+      <input id="tokenInput" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" aria-label="GitHub 토큰" placeholder="ghp_...">
       <button class="solid" id="connectButton" type="button">연결</button>
     </div>
-    <div><button id="localOnly" type="button">이 기기에서만 쓰기</button></div>
+    <div class="connect-links">
+      <a class="linkbutton" href="https://github.com/settings/tokens/new?scopes=gist&amp;description=ildan" target="_blank" rel="noopener">GitHub 토큰 만들기</a>
+      <button id="localOnly" type="button">이 기기에서만 쓰기</button>
+    </div>
   </section>
   <section aria-labelledby="todayTitle">
     <h2 id="todayTitle">오늘</h2>
@@ -138,7 +203,7 @@
     <div class="legend" id="legend"></div>
     <div class="cal" id="calendar"></div>
   </section>
-  <section>
+  <section id="alertSection">
     <button id="soundButton" type="button">알림 켜기</button>
     <p class="help" id="soundHelp">PC에서 켜 두면 페이지가 뒤에 있어도 Windows 알림으로 알려 줍니다.</p>
   </section>
@@ -151,9 +216,9 @@
         <p class="help">첫 단계는 하기 싫은 날에도 할 수 있을 만큼 작게 잡으세요.</p>
       </div>
       <div class="numbers">
-        <label>타이머(분)<input id="startMinutes" type="number" min="1" max="60" required></label>
-        <label>미루기 간격(분)<input id="snoozeMinutes" type="number" min="1" max="240" required></label>
-        <label>하루 미루기 횟수<input id="maxSnoozes" type="number" min="0" max="5" required></label>
+        <label>타이머(분)<input id="startMinutes" type="number" inputmode="numeric" min="1" max="60" required></label>
+        <label>미루기 간격(분)<input id="snoozeMinutes" type="number" inputmode="numeric" min="1" max="240" required></label>
+        <label>하루 미루기 횟수<input id="maxSnoozes" type="number" inputmode="numeric" min="0" max="5" required></label>
       </div>
       <div class="actions">
         <button class="solid" type="submit" id="saveSettings">저장</button>
@@ -331,13 +396,13 @@
     const poster = el("div", "poster");
     const now = Date.now();
     const duration = durationText(config.startMinutes);
-    poster.append(el("div", "eyebrow", "지금 할 일"), el("div", "big", habit.name), el("div", "step", habit.firstStep),
+    poster.append(el("div", "eyebrow", "지금 할 일"), el("div", `big${habit.name.length > 4 ? " long" : ""}`, habit.name), el("div", "step", habit.firstStep),
       el("div", "small", `${duration}만 하면 오늘은 성공입니다.`));
     if (missedYesterday(now, habit.id)) poster.append(el("div", "small", "어제 빠져도 괜찮아요. 오늘 하면 다시 이어집니다."));
     poster.append(btn(`${duration}만 시작`, "go", () => startTimer(habit.id)));
     const buttons = el("div", "buttons");
     const left = config.maxSnoozes - (entryOf(habit.id).snoozes ?? 0);
-    if (left > 0) buttons.append(btn(`${config.snoozeMinutes}분 뒤에 (오늘 ${left}번 남음)`, "", snooze));
+    if (left > 0) buttons.append(btn(`${config.snoozeMinutes}분 뒤에 (오늘 ${left}번 남음)`, "snooze", snooze));
     buttons.append(btn("이미 했어요", "", () => markDone(habit.id)),
       btn("오늘은 안 할래요", "", () => { skipping = true; render(); }));
     poster.append(buttons);
@@ -351,6 +416,7 @@
     field.id = "skipPhrase";
     field.setAttribute("aria-label", "건너뛰기 문장 입력");
     field.autocomplete = "off";
+    field.enterKeyHint = "done";
     const error = el("div", "small", " ");
     error.setAttribute("role", "status");
     field.addEventListener("keydown", (event) => {
@@ -361,7 +427,7 @@
     poster.append(el("div", "eyebrow", "정말 건너뛸 거라면 아래 문장을 그대로 입력하세요."),
       el("div", "big phrase", phrase), field, error,
       btn("돌아가기", "go", () => { skipping = false; render(); }), buttons);
-    queueMicrotask(() => field.focus());
+    if (matchMedia("(pointer: fine)").matches) queueMicrotask(() => field.focus()); // 휴대폰은 키보드가 문장을 가리지 않게 눌러서 연다.
     return poster;
   }
 
