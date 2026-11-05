@@ -318,7 +318,9 @@
     setSession({ habitId, phase: "timer", day: dayKey(Date.now()), finishAt: Date.now() + config.startMinutes * MINUTE });
   }
   function completeTimer() {
-    setEntry(session.habitId, { status: "done", minutes: Math.max(1, Math.round(config.startMinutes)) });
+    const entry = entryOf(session.habitId);
+    const earlier = entry.status === "done" ? entry.minutes ?? 0 : 0; // 다시 시작한 시간은 그날 기록에 더한다.
+    setEntry(session.habitId, { status: "done", minutes: earlier + Math.max(1, Math.round(config.startMinutes)) });
     setSession({ phase: "done" });
     alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
   }
@@ -413,12 +415,15 @@
       name.append(el("strong", "", habit.name), el("small", "", habit.firstStep));
       row.append(name);
       const status = today[habit.id]?.status;
-      if (status) row.append(el("span", `stamp ${status}`, status === "done" ? "완료" : "건너뜀"));
-      else {
-        const actions = el("div", "actions");
+      const actions = el("div", "actions");
+      if (status) {
+        const minutes = today[habit.id]?.minutes;
+        row.append(el("span", `stamp ${status}`, status === "done" ? `완료${minutes ? ` · ${minutes}분` : ""}` : "건너뜀"));
+        actions.append(btn("다시 시작", "", () => startTimer(habit.id)));
+      } else {
         actions.append(btn("시작", "solid", () => startTimer(habit.id)), btn("완료", "", () => markDone(habit.id)));
-        row.append(actions);
       }
+      row.append(actions);
       return row;
     });
     $("today").replaceChildren(...rows);
