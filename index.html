@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>일단</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon128.png">
+<link rel="apple-touch-icon" href="icon128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+  /* Layout: a quiet daily ledger that is taken over by a full cobalt poster when it is time to start. */
+  :root {
+    --bg: #e9edf5; --surface: #f7f9fc; --ink: #131a2e; --muted: #586079; --line: #c9d1e0;
+    --accent: #1f3fd6; --on-accent: #ffffff;
+    --flood: #1f3fd6; --on-flood: #ffffff; --on-flood-muted: #d3dcff;
+    --h1: #1f3fd6; --h2: #c2410c; --h3: #0b7a75; --danger: #b42318;
+    --display: "Black Han Sans", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    --body: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1424; --surface: #171e33; --ink: #e8ecf6; --muted: #a0aac4; --line: #2c3552;
+      --accent: #8ea6ff; --on-accent: #0f1424; --flood: #2440c9;
+      --h1: #8ea6ff; --h2: #ff9a66; --h3: #4fd1c5; --danger: #ff9c8f; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1424; --surface: #171e33; --ink: #e8ecf6; --muted: #a0aac4; --line: #2c3552;
+    --accent: #8ea6ff; --on-accent: #0f1424; --flood: #2440c9;
+    --h1: #8ea6ff; --h2: #ff9a66; --h3: #4fd1c5; --danger: #ff9c8f; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; border-radius: 6px; padding: 9px 14px; min-height: 42px; font-weight: 500;
+    background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+  button.solid { background: var(--accent); color: var(--on-accent); box-shadow: none; font-weight: 700; }
+  button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+
+  .page { max-width: 44rem; margin: 0 auto; padding-block: 28px 56px; display: grid; gap: 32px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px; }
+  .brand { font-family: var(--display); font-size: 1.75rem; margin: 0; font-weight: 400; }
+  .date { color: var(--muted); font-size: 14px; }
+  .next { font-size: 1.15rem; margin: 6px 0 0; width: 100%; text-wrap: balance; }
+  h2 { font-size: 13px; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 500; }
+
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .row:last-child { border-bottom: 1px solid var(--line); }
+  .when { width: 3.2rem; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 14px; }
+  .name { flex: 1 1 8rem; min-width: 0; }
+  .name strong { display: block; font-weight: 700; }
+  .name small { display: block; color: var(--muted); font-size: 13px; }
+  .actions { display: flex; gap: 6px; }
+  .stamp { font-weight: 700; color: var(--accent); padding: 8px 0; }
+  .stamp.skipped { color: var(--muted); font-weight: 500; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .pip { width: 8px; height: 8px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px var(--line); }
+  .pip.h0.on { background: var(--h1); box-shadow: none; }
+  .pip.h1.on { background: var(--h2); box-shadow: none; }
+  .pip.h2.on { background: var(--h3); box-shadow: none; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .dow { text-align: center; font-size: 12px; color: var(--muted); }
+  .day { background: var(--surface); border-radius: 4px; padding: 5px 4px 7px; display: grid; gap: 4px; justify-items: center; font-size: 12px;
+    color: var(--muted); font-variant-numeric: tabular-nums; min-width: 0; }
+  .day.today { box-shadow: inset 0 0 0 2px var(--accent); color: var(--ink); font-weight: 700; }
+  .pips { display: flex; gap: 2px; }
+
+  details { border-top: 1px solid var(--line); padding-top: 12px; }
+  summary { cursor: pointer; color: var(--muted); }
+  .settings { display: grid; gap: 14px; margin-top: 14px; }
+  .habit { display: grid; grid-template-columns: 6rem 7rem minmax(0, 1fr); gap: 6px; }
+  .numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .help { color: var(--muted); font-size: 14px; margin: 8px 0 0; max-width: 62ch; }
+  .notice { color: var(--danger); font-size: 14px; margin: 0; }
+  .saved { color: var(--muted); font-size: 14px; }
+  a { color: var(--accent); }
+  .connect { display: grid; gap: 8px; padding: 14px; background: var(--surface); border-radius: 6px; }
+  .connect-row { display: flex; gap: 8px; }
+
+  .sound { font-size: 14px; color: var(--muted); }
+
+  .flood { position: fixed; inset: 0; z-index: 5; overflow: auto; background: var(--flood); color: var(--on-flood);
+    display: grid; align-content: center; justify-items: start;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px)); }
+  .poster { width: 100%; max-width: 44rem; margin: 0 auto; display: grid; gap: 8px; justify-items: start; }
+  .eyebrow { color: var(--on-flood-muted); font-size: 1.05rem; }
+  .big { font-family: var(--display); font-size: clamp(4.5rem, 20vw, 10rem); line-height: 1.05; }
+  .big.phrase { font-size: clamp(2.2rem, 8vw, 4rem); }
+  .step { font-size: clamp(1.25rem, 4vw, 1.7rem); font-weight: 700; text-wrap: balance; }
+  .small { color: var(--on-flood-muted); }
+  .flood button { box-shadow: inset 0 0 0 1px var(--on-flood-muted); color: var(--on-flood); }
+  .flood button.go { background: var(--on-flood); color: #1f3fd6; box-shadow: none; font-size: 1.35rem; font-weight: 700; padding: 16px 32px; margin-top: 14px; }
+  .flood button.go:focus-visible, .flood button:focus-visible, .flood input:focus-visible { outline-color: var(--on-flood); }
+  .flood .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .flood input { max-width: 22rem; background: transparent; color: var(--on-flood); border-color: var(--on-flood-muted); font-size: 1.1rem; margin-top: 8px; }
+  .clock { font-family: var(--display); font-size: clamp(5.5rem, 26vw, 13rem); line-height: 1; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 30rem) {
+    .habit { grid-template-columns: 1fr 1fr; }
+    .habit .wide { grid-column: 1 / -1; }
+    .when { width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage"></div>
+<main class="page" id="home">
+  <header>
+    <h1 class="brand">일단</h1>
+    <span class="date" id="date"></span>
+    <p class="next" id="next">기록을 불러오는 중입니다.</p>
+  </header>
+  <p class="notice" id="notice" hidden></p>
+  <section class="connect" id="connectBox" hidden aria-labelledby="connectTitle">
+    <h2 id="connectTitle">PC와 휴대폰 기록 연결</h2>
+    <p class="help">연결하지 않으면 이 브라우저에만 기록됩니다. <a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=ildan" target="_blank" rel="noopener">GitHub 토큰 만들기</a>에서 gist 권한만 체크된 토큰을 만들어 붙여 넣으세요. 토큰은 이 기기의 브라우저에만 저장됩니다.</p>
+    <div class="connect-row">
+      <input id="tokenInput" type="password" autocomplete="off" aria-label="GitHub 토큰" placeholder="ghp_...">
+      <button class="solid" id="connectButton" type="button">연결</button>
+    </div>
+    <div><button id="localOnly" type="button">이 기기에서만 쓰기</button></div>
+  </section>
+  <section aria-labelledby="todayTitle">
+    <h2 id="todayTitle">오늘</h2>
+    <div id="today"></div>
+  </section>
+  <section aria-labelledby="monthTitle">
+    <h2 id="monthTitle">이번 달</h2>
+    <div class="legend" id="legend"></div>
+    <div class="cal" id="calendar"></div>
+  </section>
+  <section>
+    <button id="soundButton" type="button">알림 켜기</button>
+    <p class="help" id="soundHelp">PC에서 켜 두면 페이지가 뒤에 있어도 Windows 알림으로 알려 줍니다.</p>
+  </section>
+  <details id="settingsBox">
+    <summary>설정</summary>
+    <form class="settings" id="settings">
+      <div>
+        <h2>할 일</h2>
+        <div id="habitFields" style="display:grid;gap:8px"></div>
+        <p class="help">첫 단계는 하기 싫은 날에도 할 수 있을 만큼 작게 잡으세요.</p>
+      </div>
+      <div class="numbers">
+        <label>타이머(분)<input id="startMinutes" type="number" min="1" max="60" required></label>
+        <label>미루기 간격(분)<input id="snoozeMinutes" type="number" min="1" max="240" required></label>
+        <label>하루 미루기 횟수<input id="maxSnoozes" type="number" min="0" max="5" required></label>
+      </div>
+      <div class="actions">
+        <button class="solid" type="submit" id="saveSettings">저장</button>
+        <span class="saved" id="savedMessage" role="status"></span>
+      </div>
+      <div><button id="disconnect" type="button">기록 연결</button></div>
+    </form>
+  </details>
+</main>
+
+<script>
+(() => {
+  const DEFAULTS = {
+    startMinutes: 2, snoozeMinutes: 30, maxSnoozes: 2, gapMinutes: 20,
+    habits: [
+      { id: "study", name: "공부", time: "14:00", firstStep: "책 펴고 한 문단만 읽기" },
+      { id: "exercise", name: "운동", time: "18:00", firstStep: "운동복 입고 스쿼트 5개" },
+      { id: "clean", name: "청소", time: "21:00", firstStep: "눈에 보이는 물건 3개 제자리에 두기" },
+    ],
+  };
+  const MINUTE = 60000, DAY_START_HOUR = 4, DAY_MS = 86400000;
+  const $ = (id) => document.getElementById(id);
+  const pad = (n) => String(n).padStart(2, "0");
+
+  // ---------- 판단 로직 ----------
+  function dayKey(ms) {
+    const d = new Date(ms - DAY_START_HOUR * 3600000);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+  const isFinished = (entry) => entry?.status === "done" || entry?.status === "skipped";
+  function dueHabit(ms) {
+    const now = new Date(ms);
+    const clock = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const afterMidnight = now.getHours() < DAY_START_HOUR;
+    const today = days[dayKey(ms)] ?? {};
+    return [...config.habits].sort((a, b) => a.time.localeCompare(b.time))
+      .find((h) => (afterMidnight || clock >= h.time) && !isFinished(today[h.id])) ?? null;
+  }
+  function missedYesterday(ms, id) {
+    const today = dayKey(ms);
+    if (!Object.keys(days).some((day) => day < today)) return false;
+    return days[dayKey(ms - DAY_MS)]?.[id]?.status !== "done";
+  }
+  const skipPhrase = (name) => `오늘 ${name} 안 한다`;
+  const squash = (text) => text.replace(/\s+/g, "");
+  const durationText = (m) => (m >= 1 ? `${m}분` : `${Math.round(m * 60)}초`);
+  const clockText = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
+
+  // ---------- 상태와 저장 ----------
+  let config = DEFAULTS, days = {}, session = {};
+  let appReady = false, daysReady = false, skipping = false, ticker = null, stageKey = "", settingsFilled = false;
+  let queue = Promise.resolve();
+
+  function showNotice(text) {
+    $("notice").textContent = text;
+    $("notice").hidden = !text;
+  }
+  function setSession(patch) {
+    session = { ...session, ...patch };
+    put("app/session", session);
+    render();
+  }
+  function setEntry(habitId, patch, ms = Date.now()) {
+    const key = dayKey(ms);
+    const day = { ...days[key], [habitId]: { ...days[key]?.[habitId], ...patch } };
+    days = { ...days, [key]: day };
+    put(`days/${key}`, day);
+  }
+  const entryOf = (id, ms = Date.now()) => days[dayKey(ms)]?.[id] ?? {};
+  const currentHabit = () => config.habits.find((h) => h.id === session.habitId);
+  const quiet = (minutes) => ({ phase: null, quietUntil: Date.now() + minutes * MINUTE });
+
+  // ---------- 알림 ----------
+  let audio = null;
+  function enableAudio() {
+    if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+    audio.resume();
+  }
+  function beep() {
+    if (!audio) return;
+    [0, 0.22].forEach((delay) => {
+      const osc = audio.createOscillator(), gain = audio.createGain();
+      osc.frequency.value = 880;
+      gain.gain.value = 0.15;
+      osc.connect(gain).connect(audio.destination);
+      osc.start(audio.currentTime + delay);
+      osc.stop(audio.currentTime + delay + 0.16);
+    });
+  }
+  function alertUser(message) {
+    beep();
+    try {
+      if (window.Notification?.permission === "granted") new Notification("일단", { body: message });
+    } catch {} // 휴대폰 브라우저는 페이지에서 직접 만든 알림을 막는다.
+  }
+  function refreshAlertButton() {
+    const on = window.Notification?.permission === "granted";
+    $("soundButton").hidden = on || !window.Notification;
+    if (on) $("soundHelp").textContent = "알림이 켜져 있습니다.";
+  }
+  document.addEventListener("pointerdown", enableAudio, { once: true });
+  $("soundButton").addEventListener("click", async () => {
+    enableAudio();
+    await window.Notification?.requestPermission();
+    refreshAlertButton();
+  });
+
+  // ---------- 행동 ----------
+  function startTimer(habitId) {
+    setSession({ habitId, phase: "timer", day: dayKey(Date.now()), finishAt: Date.now() + config.startMinutes * MINUTE });
+  }
+  function completeTimer() {
+    setEntry(session.habitId, { status: "done", minutes: Math.max(1, Math.round(config.startMinutes)) });
+    setSession({ phase: "done" });
+    alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
+  }
+  function snooze() {
+    const entry = entryOf(session.habitId);
+    if ((entry.snoozes ?? 0) >= config.maxSnoozes) return;
+    setEntry(session.habitId, { snoozes: (entry.snoozes ?? 0) + 1 });
+    setSession(quiet(config.snoozeMinutes));
+  }
+  function trySkip(text, errorNode) {
+    const habit = currentHabit();
+    if (squash(text) !== squash(skipPhrase(habit.name))) {
+      errorNode.textContent = "문장이 달라요. 위 문장을 그대로 입력하세요.";
+      return;
+    }
+    setEntry(habit.id, { status: "skipped" });
+    skipping = false;
+    setSession(quiet(config.gapMinutes));
+  }
+  function finishExtra() {
+    const entry = entryOf(session.habitId);
+    const added = Math.round((Date.now() - session.startedAt) / MINUTE);
+    setEntry(session.habitId, { minutes: (entry.minutes ?? 0) + added });
+    setSession(quiet(config.gapMinutes));
+  }
+  function markDone(habitId) {
+    setEntry(habitId, { status: "done", minutes: Math.max(1, Math.round(config.startMinutes)) });
+    if (session.habitId === habitId && session.phase === "prompt") setSession(quiet(config.gapMinutes));
+    else render();
+  }
+
+  // 시간이 되었는지 확인한다. 상태가 바뀔 때만 저장한다.
+  function check() {
+    if (!appReady || !daysReady || !(token || localOnly)) return;
+    const now = Date.now();
+    if (session.phase === "timer" && now >= session.finishAt) completeTimer();
+    if (session.phase && (session.day !== dayKey(now) || !currentHabit())) setSession({ phase: null });
+    if (session.phase === "prompt" && isFinished(entryOf(session.habitId))) setSession({ phase: null });
+    if (session.phase || now < (session.quietUntil ?? 0)) return;
+    const habit = dueHabit(now);
+    if (habit) {
+      setSession({ habitId: habit.id, phase: "prompt", day: dayKey(now) });
+      alertUser(`지금 할 일: ${habit.name}. ${habit.firstStep}`);
+    }
+  }
+
+  // ---------- 화면 ----------
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function btn(text, className, onClick) {
+    const node = el("button", className, text);
+    node.type = "button";
+    node.addEventListener("click", onClick);
+    return node;
+  }
+
+  function promptView(habit) {
+    const poster = el("div", "poster");
+    const now = Date.now();
+    const duration = durationText(config.startMinutes);
+    poster.append(el("div", "eyebrow", "지금 할 일"), el("div", "big", habit.name), el("div", "step", habit.firstStep),
+      el("div", "small", `${duration}만 하면 오늘은 성공입니다.`));
+    if (missedYesterday(now, habit.id)) poster.append(el("div", "small", "어제 빠져도 괜찮아요. 오늘 하면 다시 이어집니다."));
+    poster.append(btn(`${duration}만 시작`, "go", () => startTimer(habit.id)));
+    const buttons = el("div", "buttons");
+    const left = config.maxSnoozes - (entryOf(habit.id).snoozes ?? 0);
+    if (left > 0) buttons.append(btn(`${config.snoozeMinutes}분 뒤에 (오늘 ${left}번 남음)`, "", snooze));
+    buttons.append(btn("이미 했어요", "", () => markDone(habit.id)),
+      btn("오늘은 안 할래요", "", () => { skipping = true; render(); }));
+    poster.append(buttons);
+    return poster;
+  }
+
+  function skipView(habit) {
+    const poster = el("div", "poster");
+    const phrase = skipPhrase(habit.name);
+    const field = el("input");
+    field.id = "skipPhrase";
+    field.setAttribute("aria-label", "건너뛰기 문장 입력");
+    field.autocomplete = "off";
+    const error = el("div", "small", " ");
+    error.setAttribute("role", "status");
+    field.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.isComposing) trySkip(field.value, error);
+    });
+    const buttons = el("div", "buttons");
+    buttons.append(btn("건너뛰기", "", () => trySkip(field.value, error)));
+    poster.append(el("div", "eyebrow", "정말 건너뛸 거라면 아래 문장을 그대로 입력하세요."),
+      el("div", "big phrase", phrase), field, error,
+      btn("돌아가기", "go", () => { skipping = false; render(); }), buttons);
+    queueMicrotask(() => field.focus());
+    return poster;
+  }
+
+  function timerView(habit) {
+    const poster = el("div", "poster");
+    const clock = el("div", "clock");
+    const paint = () => { clock.textContent = clockText(Math.max(0, Math.ceil((session.finishAt - Date.now()) / 1000))); };
+    paint();
+    ticker = setInterval(() => { paint(); if (Date.now() >= session.finishAt) check(); }, 250);
+    poster.append(el("div", "eyebrow", habit.name), clock, el("div", "step", habit.firstStep),
+      el("div", "small", "끝나면 알림으로 알려 줍니다. 이 탭을 닫아도 기록은 이어집니다."));
+    return poster;
+  }
+
+  function doneView(habit) {
+    const poster = el("div", "poster");
+    poster.append(el("div", "big", "성공"), el("div", "step", `오늘 ${habit.name} 칸이 채워졌습니다.`),
+      btn("더 할래", "go", () => setSession({ phase: "extra", startedAt: Date.now() })));
+    const buttons = el("div", "buttons");
+    buttons.append(btn("여기서 끝", "", () => setSession(quiet(config.gapMinutes))));
+    poster.append(buttons);
+    return poster;
+  }
+
+  function extraView(habit) {
+    const poster = el("div", "poster");
+    const clock = el("div", "clock");
+    const paint = () => { clock.textContent = `+${clockText(Math.floor((Date.now() - session.startedAt) / 1000))}`; };
+    paint();
+    ticker = setInterval(paint, 500);
+    poster.append(el("div", "eyebrow", `${habit.name} 더 하는 중`), clock, btn("끝", "go", finishExtra));
+    return poster;
+  }
+
+  function renderStage() {
+    const habit = currentHabit();
+    const phase = habit ? session.phase : null;
+    if (phase !== "prompt") skipping = false;
+    const key = JSON.stringify([phase, habit, skipping, session.finishAt, session.startedAt, entryOf(session.habitId).snoozes,
+      config.startMinutes, config.snoozeMinutes, config.maxSnoozes]);
+    if (key === stageKey) return;
+    stageKey = key;
+    clearInterval(ticker);
+    $("stage").replaceChildren();
+    $("home").inert = Boolean(phase);
+    if (!phase) return;
+    const view = { prompt: skipping ? skipView : promptView, timer: timerView, done: doneView, extra: extraView }[phase];
+    if (!view) return;
+    const flood = el("div", "flood");
+    flood.append(view(habit));
+    $("stage").append(flood);
+  }
+
+  function renderToday(now) {
+    const today = days[dayKey(now)] ?? {};
+    const rows = [...config.habits].sort((a, b) => a.time.localeCompare(b.time)).map((habit) => {
+      const row = el("div", "row");
+      const name = el("div", "name");
+      name.append(el("strong", "", habit.name), el("small", "", habit.firstStep));
+      row.append(el("span", "when", habit.time), name);
+      const status = today[habit.id]?.status;
+      if (status) row.append(el("span", `stamp ${status}`, status === "done" ? "완료" : "건너뜀"));
+      else {
+        const actions = el("div", "actions");
+        actions.append(btn("시작", "solid", () => startTimer(habit.id)), btn("완료", "", () => markDone(habit.id)));
+        row.append(actions);
+      }
+      return row;
+    });
+    $("today").replaceChildren(...rows);
+    const waiting = config.habits.filter((h) => !isFinished(today[h.id])).sort((a, b) => a.time.localeCompare(b.time));
+    if (!waiting.length) $("next").textContent = "오늘 할 일을 모두 마쳤습니다.";
+    else {
+      const next = waiting[0];
+      const late = dueHabit(now)?.id === next.id;
+      $("next").textContent = late ? `${next.name} 시간이 지났습니다.` : `다음은 ${next.time} ${next.name}입니다.`;
+    }
+  }
+
+  function renderMonth(now) {
+    const key = dayKey(now), [year, month] = key.split("-").map(Number);
+    const counts = config.habits.map((h) => Object.entries(days)
+      .filter(([day, e]) => day.startsWith(key.slice(0, 7)) && e[h.id]?.status === "done").length);
+    $("legend").replaceChildren(...config.habits.map((h, i) => {
+      const item = el("span");
+      item.append(el("i", `pip h${i} on`), `${h.name} ${counts[i]}일`);
+      return item;
+    }));
+    const cells = ["일", "월", "화", "수", "목", "금", "토"].map((d) => el("div", "dow", d));
+    const lead = new Date(year, month - 1, 1).getDay();
+    for (let i = 0; i < lead; i++) cells.push(el("div"));
+    const total = new Date(year, month, 0).getDate();
+    for (let d = 1; d <= total; d++) {
+      const dayId = `${year}-${pad(month)}-${pad(d)}`;
+      const cell = el("div", `day${dayId === key ? " today" : ""}`, String(d));
+      const pips = el("div", "pips");
+      config.habits.forEach((h, i) => pips.append(el("i", `pip h${i}${days[dayId]?.[h.id]?.status === "done" ? " on" : ""}`)));
+      cell.append(pips);
+      cells.push(cell);
+    }
+    $("calendar").replaceChildren(...cells);
+    const shifted = new Date(now - DAY_START_HOUR * 3600000);
+    $("date").textContent = `${month}월 ${shifted.getDate()}일 ${["일", "월", "화", "수", "목", "금", "토"][shifted.getDay()]}요일`;
+    $("monthTitle").textContent = `${month}월 기록`;
+  }
+
+  function fillSettings() {
+    const rows = config.habits.map((h) => {
+      const row = el("div", "habit");
+      row.dataset.id = h.id;
+      [["name", "text", h.name, "이름", ""], ["time", "time", h.time, "시작 시간", ""], ["firstStep", "text", h.firstStep, "첫 단계", "wide"]]
+        .forEach(([key, type, value, label, cls]) => {
+          const input = el("input", cls);
+          input.id = `${h.id}-${key}`;
+          input.type = type;
+          input.value = value;
+          input.required = true;
+          input.dataset.key = key;
+          input.setAttribute("aria-label", `${h.name} ${label}`);
+          row.append(input);
+        });
+      return row;
+    });
+    $("habitFields").replaceChildren(...rows);
+    ["startMinutes", "snoozeMinutes", "maxSnoozes"].forEach((id) => { $(id).value = config[id]; });
+  }
+
+  function render() {
+    const now = Date.now();
+    renderStage();
+    renderToday(now);
+    renderMonth(now);
+    if (!settingsFilled) { fillSettings(); settingsFilled = appReady; }
+  }
+
+  $("settings").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const habits = [...document.querySelectorAll(".habit")].map((row) => {
+      const value = (key) => row.querySelector(`[data-key=${key}]`).value.trim();
+      return { id: row.dataset.id, name: value("name"), time: value("time"), firstStep: value("firstStep") };
+    });
+    config = { ...config, habits, startMinutes: Number($("startMinutes").value),
+      snoozeMinutes: Number($("snoozeMinutes").value), maxSnoozes: Number($("maxSnoozes").value) };
+    put("app/config", config);
+    $("savedMessage").textContent = "저장했습니다.";
+    render();
+  });
+
+  // ---------- 저장: 브라우저에 먼저, 그다음 GitHub Gist ----------
+  const API = "https://api.github.com";
+  const STATE_KEY = "ildan-state", TOKEN_KEY = "ildan-token", LOCAL_KEY = "ildan-local";
+  const GIST_DESCRIPTION = "ildan habit data", GIST_FILE = "ildan-data.json";
+  const POLL_MS = 30000, PUSH_DELAY_MS = 1500, VERIFY_DELAY_MS = 2000;
+  let docs = {}, dirty = new Set(), gistId = null, token = "", localOnly = false;
+  let syncing = false, syncAgain = false, pushTimer = null;
+
+  const storage = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch {} },
+    remove(key) { try { localStorage.removeItem(key); } catch {} },
+  };
+  function persist() {
+    storage.set(STATE_KEY, JSON.stringify({ docs, dirty: [...dirty], gistId }));
+  }
+  function put(path, body) {
+    docs[path] = body;
+    dirty.add(path);
+    persist();
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(sync, PUSH_DELAY_MS);
+  }
+
+  async function github(path, options = {}) {
+    const res = await fetch(API + path, {
+      ...options,
+      cache: "no-cache",
+      headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, ...options.headers },
+    });
+    if (res.status === 401) throw new Error("token");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+  async function findGist() {
+    for (let page = 1; page <= 10; page++) {
+      const list = await github(`/gists?per_page=100&page=${page}`);
+      const found = list.find((g) => g.description === GIST_DESCRIPTION && g.files[GIST_FILE]);
+      if (found) return found.id;
+      if (list.length < 100) break;
+    }
+    const created = await github("/gists", {
+      method: "POST",
+      body: JSON.stringify({
+        description: GIST_DESCRIPTION, public: false,
+        files: { [GIST_FILE]: { content: JSON.stringify({ docs }, null, 1) } },
+      }),
+    });
+    return created.id;
+  }
+
+  // 같은 날 두 기기에서 고쳐도 할 일별로 합치고, 완료가 항상 이긴다.
+  function mergeDoc(path, remote, local) {
+    if (!path.startsWith("days/") || !remote) return local;
+    const day = { ...remote };
+    for (const [id, entry] of Object.entries(local)) {
+      const other = remote[id] ?? {};
+      day[id] = { ...other, ...entry };
+      if (other.status === "done") day[id].status = "done";
+      for (const field of ["minutes", "snoozes"]) {
+        const value = Math.max(other[field] ?? 0, entry[field] ?? 0);
+        if (value) day[id][field] = value;
+      }
+    }
+    return day;
+  }
+
+  async function sync() {
+    if (!token) return;
+    if (syncing) { syncAgain = true; return; }
+    syncing = true;
+    try {
+      if (!gistId) gistId = await findGist();
+      const gist = await github(`/gists/${gistId}`);
+      const merged = { ...JSON.parse(gist.files[GIST_FILE].content).docs };
+      const sent = [...dirty].map((path) => [path, docs[path]]);
+      for (const [path, body] of sent) merged[path] = mergeDoc(path, merged[path], body);
+      if (sent.length) {
+        await github(`/gists/${gistId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ files: { [GIST_FILE]: { content: JSON.stringify({ docs: merged }, null, 1) } } }),
+        });
+        // Gist에는 잠금이 없어 다른 기기가 같은 순간 덮어쓸 수 있으니, 남아 있는지 확인한다.
+        await new Promise((resolve) => setTimeout(resolve, VERIFY_DELAY_MS));
+        const saved = JSON.parse((await github(`/gists/${gistId}`)).files[GIST_FILE].content).docs;
+        for (const [path, body] of sent) {
+          const kept = JSON.stringify(mergeDoc(path, saved[path], body)) === JSON.stringify(saved[path])
+            || !path.startsWith("days/");
+          if (kept && docs[path] === body) dirty.delete(path);
+          if (!kept) syncAgain = true;
+          merged[path] = mergeDoc(path, saved[path], body);
+        }
+        for (const [path, body] of Object.entries(saved)) if (!sent.some(([p]) => p === path)) merged[path] = body;
+      }
+      for (const path of dirty) merged[path] = mergeDoc(path, merged[path], docs[path]);
+      docs = merged;
+      persist();
+      applyDocs();
+      showNotice("");
+    } catch (error) {
+      if (error.message === "token") {
+        forgetToken();
+        showNotice("토큰이 맞지 않거나 만료되었습니다. 새 토큰을 넣어 주세요.");
+      } else {
+        showNotice("지금은 동기화하지 못했습니다. 기록은 이 기기에 저장되어 있고 연결되면 다시 보냅니다.");
+      }
+    } finally {
+      syncing = false;
+      appReady = daysReady = true;
+      check();
+      if (syncAgain) { syncAgain = false; sync(); }
+    }
+  }
+
+  function applyDocs() {
+    if (docs["app/config"] && !$("settingsBox").open) {
+      config = { ...DEFAULTS, ...docs["app/config"] };
+      settingsFilled = false;
+    }
+    session = { ...docs["app/session"] };
+    days = Object.fromEntries(Object.entries(docs)
+      .filter(([key]) => key.startsWith("days/"))
+      .map(([key, value]) => [key.slice(5), value]));
+    render();
+  }
+
+  function showConnection() {
+    $("connectBox").hidden = Boolean(token) || localOnly;
+    $("disconnect").textContent = token ? "이 기기의 연결 해제" : "기록 연결";
+  }
+  function setLocalOnly(value) {
+    localOnly = value;
+    if (value) storage.set(LOCAL_KEY, "1");
+    else storage.remove(LOCAL_KEY);
+    showConnection();
+    check();
+  }
+  function forgetToken() {
+    token = "";
+    gistId = null;
+    storage.remove(TOKEN_KEY);
+    persist();
+    showConnection();
+  }
+  $("connectButton").addEventListener("click", () => {
+    token = $("tokenInput").value.trim();
+    $("tokenInput").value = "";
+    if (!token) return;
+    storage.set(TOKEN_KEY, token);
+    setLocalOnly(false);
+    sync();
+  });
+  $("localOnly").addEventListener("click", () => setLocalOnly(true));
+  $("disconnect").addEventListener("click", () => {
+    if (token) forgetToken();
+    setLocalOnly(false);
+    $("settingsBox").open = false;
+    window.scrollTo(0, 0);
+  });
+
+  // ---------- 시작 ----------
+  try {
+    const saved = JSON.parse(storage.get(STATE_KEY) ?? "{}");
+    docs = saved.docs ?? {};
+    dirty = new Set(saved.dirty ?? []);
+    gistId = saved.gistId ?? null;
+  } catch {}
+  token = storage.get(TOKEN_KEY) ?? "";
+  localOnly = storage.get(LOCAL_KEY) === "1";
+  showConnection();
+  refreshAlertButton();
+  applyDocs();
+  if (token) sync();
+  else { appReady = daysReady = true; check(); }
+  setInterval(check, 5000);
+  setInterval(render, 30000);
+  setInterval(() => { if (!document.hidden) sync(); }, POLL_MS);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { check(); sync(); } });
+})();
+</script>
+</body>
+</html>

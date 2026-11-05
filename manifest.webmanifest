@@ -1,0 +1,10 @@
+{
+  "name": "일단",
+  "short_name": "일단",
+  "description": "하기 싫은 일을 2분만 시작하게 만드는 습관 페이지",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1f3fd6",
+  "theme_color": "#1f3fd6",
+  "icons": [{ "src": "icon128.png", "sizes": "128x128", "type": "image/png" }]
+}
