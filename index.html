@@ -331,7 +331,9 @@
     setSession({ phase: null });
   }
   function markDone(habitId) {
-    setEntry(habitId, { status: "done", minutes: Math.max(1, Math.round(config.startMinutes)) });
+    const entry = entryOf(habitId);
+    const earlier = entry.status === "done" ? entry.minutes ?? 0 : 0; // 이미 완료한 일은 시간을 더한다.
+    setEntry(habitId, { status: "done", minutes: earlier + Math.max(1, Math.round(config.startMinutes)) });
     render();
   }
 
@@ -419,7 +421,7 @@
       if (status) {
         const minutes = today[habit.id]?.minutes;
         row.append(el("span", `stamp ${status}`, status === "done" ? `완료${minutes ? ` · ${minutes}분` : ""}` : "건너뜀"));
-        actions.append(btn("다시 시작", "", () => startTimer(habit.id)));
+        actions.append(btn("다시 시작", "", () => startTimer(habit.id)), btn("완료", "", () => markDone(habit.id)));
       } else {
         actions.append(btn("시작", "solid", () => startTimer(habit.id)), btn("완료", "", () => markDone(habit.id)));
       }
