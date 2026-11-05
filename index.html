@@ -659,8 +659,10 @@
     $("tokenInput").value = "";
     if (!token) return;
     storage.set(TOKEN_KEY, token);
-    setLocalOnly(false);
-    sync();
+    localOnly = false;
+    storage.remove(LOCAL_KEY);
+    showConnection();
+    sync(); // 토큰이 확인된 뒤에 sync가 check를 부른다.
   });
   $("localOnly").addEventListener("click", () => setLocalOnly(true));
   $("disconnect").addEventListener("click", () => {
