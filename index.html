@@ -68,6 +68,7 @@
   .name strong { display: block; font-weight: 700; }
   .name small { display: block; color: var(--muted); font-size: 13px; }
   .actions { display: flex; gap: 6px; }
+  .reset-all { margin-top: 14px; color: var(--muted); }
   .stamp { font-weight: 700; color: var(--accent); padding: 8px 0; }
   .stamp.skipped { color: var(--muted); font-weight: 500; }
 
@@ -164,7 +165,7 @@
     .hero button { width: 100%; }
     .settings .actions { flex-wrap: wrap; }
     .settings .actions button { flex: 1 1 100%; }
-    #saveSettings, #disconnect, #localOnly, .linkbutton { width: 100%; justify-content: center; }
+    #saveSettings, #disconnect, #localOnly, .linkbutton, .reset-all { width: 100%; justify-content: center; }
     #connectButton { flex: none; }
     .connect-links { display: grid; }
     label { font-size: 12px; }
@@ -197,6 +198,7 @@
   <section aria-labelledby="todayTitle">
     <h2 id="todayTitle">오늘</h2>
     <div id="today"></div>
+    <button class="reset-all" id="resetAll" type="button" hidden>오늘 기록 전체 초기화</button>
   </section>
   <section aria-labelledby="monthTitle">
     <h2 id="monthTitle">이번 달</h2>
@@ -271,9 +273,26 @@
   }
   function setEntry(habitId, patch, ms = Date.now()) {
     const key = dayKey(ms);
-    const day = { ...days[key], [habitId]: { ...days[key]?.[habitId], ...patch } };
+    const day = { ...days[key], [habitId]: { ...days[key]?.[habitId], ...patch, at: ms } };
     days = { ...days, [key]: day };
     put(`days/${key}`, day);
+  }
+  // 초기화는 기록을 지우는 대신 시각을 남겨, 다른 기기에 있는 이전 기록이 되살아나지 않게 한다.
+  function resetHabits(ids) {
+    const now = Date.now(), key = dayKey(now);
+    const day = { ...days[key] };
+    for (const id of ids) day[id] = { resetAt: now };
+    days = { ...days, [key]: day };
+    put(`days/${key}`, day);
+    render();
+  }
+  let confirming = null, confirmTimer = null;
+  function confirmThen(key, action) {
+    clearTimeout(confirmTimer);
+    if (confirming === key) { confirming = null; action(); return; }
+    confirming = key;
+    render();
+    confirmTimer = setTimeout(() => { confirming = null; render(); }, 4000);
   }
   const entryOf = (id, ms = Date.now()) => days[dayKey(ms)]?.[id] ?? {};
   const currentHabit = () => config.habits.find((h) => h.id === session.habitId);
@@ -317,24 +336,22 @@
   function startTimer(habitId) {
     setSession({ habitId, phase: "timer", day: dayKey(Date.now()), finishAt: Date.now() + config.startMinutes * MINUTE });
   }
-  function completeTimer() {
+  function finishTimer(minutes, ring) {
+    if (session.phase !== "timer") return;
     const entry = entryOf(session.habitId);
     const earlier = entry.status === "done" ? entry.minutes ?? 0 : 0; // 다시 시작한 시간은 그날 기록에 더한다.
-    setEntry(session.habitId, { status: "done", minutes: earlier + Math.max(1, Math.round(config.startMinutes)) });
+    setEntry(session.habitId, { status: "done", minutes: earlier + Math.max(1, minutes) });
     setSession({ phase: "done" });
-    alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
+    if (ring) alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
   }
+  const completeTimer = () => finishTimer(Math.round(config.startMinutes), true);
+  // 타이머가 끝나기 전에 다 했을 때: 지난 시간만큼 기록한다.
+  const finishEarly = () => finishTimer(Math.round((Date.now() - (session.finishAt - config.startMinutes * MINUTE)) / MINUTE), false);
   function finishExtra() {
     const entry = entryOf(session.habitId);
     const added = Math.round((Date.now() - session.startedAt) / MINUTE);
     setEntry(session.habitId, { minutes: (entry.minutes ?? 0) + added });
     setSession({ phase: null });
-  }
-  function markDone(habitId) {
-    const entry = entryOf(habitId);
-    const earlier = entry.status === "done" ? entry.minutes ?? 0 : 0; // 이미 완료한 일은 시간을 더한다.
-    setEntry(habitId, { status: "done", minutes: earlier + Math.max(1, Math.round(config.startMinutes)) });
-    render();
   }
 
   // 타이머가 끝났는지 확인하고, 어제 남은 화면이나 이전 버전의 자동 화면을 닫는다.
@@ -365,10 +382,11 @@
     const paint = () => { clock.textContent = clockText(Math.max(0, Math.ceil((session.finishAt - Date.now()) / 1000))); };
     paint();
     ticker = setInterval(() => { paint(); if (Date.now() >= session.finishAt) check(); }, 250);
-    const buttons = el("div", "buttons end");
+    const buttons = el("div", "buttons");
     buttons.append(btn("취소", "", () => setSession({ phase: null })));
     poster.append(el("div", "eyebrow", habit.name), clock, el("div", "step", habit.firstStep),
-      el("div", "small", "이 시간만 하면 오늘은 성공입니다."), buttons);
+      el("div", "small", "이 시간만 하면 오늘은 성공입니다. 다 했으면 완료를 누르세요."),
+      btn("완료", "go", finishEarly), buttons);
     return poster;
   }
 
@@ -421,14 +439,18 @@
       if (status) {
         const minutes = today[habit.id]?.minutes;
         row.append(el("span", `stamp ${status}`, status === "done" ? `완료${minutes ? ` · ${minutes}분` : ""}` : "건너뜀"));
-        actions.append(btn("다시 시작", "", () => startTimer(habit.id)), btn("완료", "", () => markDone(habit.id)));
+        actions.append(btn("다시 시작", "", () => startTimer(habit.id)),
+          btn(confirming === habit.id ? "정말 초기화" : "초기화", "", () => confirmThen(habit.id, () => resetHabits([habit.id]))));
       } else {
-        actions.append(btn("시작", "solid", () => startTimer(habit.id)), btn("완료", "", () => markDone(habit.id)));
+        actions.append(btn("시작", "solid", () => startTimer(habit.id)));
       }
       row.append(actions);
       return row;
     });
     $("today").replaceChildren(...rows);
+    const anyRecord = config.habits.some((h) => today[h.id]?.status);
+    $("resetAll").hidden = !anyRecord;
+    $("resetAll").textContent = confirming === "all" ? "정말 오늘 기록을 모두 초기화" : "오늘 기록 전체 초기화";
 
     const waiting = config.habits.filter((h) => !isFinished(today[h.id]));
     const finished = config.habits.length - waiting.length;
@@ -505,6 +527,8 @@
     if (!settingsFilled) { fillSettings(); settingsFilled = appReady; }
   }
 
+  $("resetAll").addEventListener("click", () => confirmThen("all", () => resetHabits(config.habits.map((h) => h.id))));
+
   $("settings").addEventListener("submit", (event) => {
     event.preventDefault();
     const habits = [...document.querySelectorAll(".habit")].map((row) => {
@@ -569,18 +593,24 @@
   }
 
   // 같은 날 두 기기에서 고쳐도 할 일별로 합치고, 완료가 항상 이긴다.
+  // 단, 초기화한 시각보다 앞선 기록은 버린다.
+  function mergeEntry(a = {}, b = {}) {
+    const reset = Math.max(a.resetAt ?? 0, b.resetAt ?? 0);
+    const live = (entry) => (reset && (entry.at ?? 0) <= reset ? {} : entry);
+    const x = live(a), y = live(b);
+    const out = { ...x, ...y };
+    if (x.status === "done" || y.status === "done") out.status = "done";
+    for (const field of ["minutes", "snoozes", "at"]) {
+      const value = Math.max(x[field] ?? 0, y[field] ?? 0);
+      if (value) out[field] = value;
+    }
+    if (reset) out.resetAt = reset;
+    return out;
+  }
   function mergeDoc(path, remote, local) {
     if (!path.startsWith("days/") || !remote) return local;
     const day = { ...remote };
-    for (const [id, entry] of Object.entries(local)) {
-      const other = remote[id] ?? {};
-      day[id] = { ...other, ...entry };
-      if (other.status === "done") day[id].status = "done";
-      for (const field of ["minutes", "snoozes"]) {
-        const value = Math.max(other[field] ?? 0, entry[field] ?? 0);
-        if (value) day[id][field] = value;
-      }
-    }
+    for (const [id, entry] of Object.entries(local)) day[id] = mergeEntry(remote[id], entry);
     return day;
   }
 
