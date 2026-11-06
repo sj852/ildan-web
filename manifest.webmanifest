@@ -4,8 +4,8 @@
   "description": "하기 싫은 일을 2분만 시작하게 만드는 습관 페이지",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#e9edf5",
-  "theme_color": "#e9edf5",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
   "icons": [
     {
       "src": "icon192.png",

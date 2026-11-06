@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>일단</title>
-<meta name="theme-color" content="#e9edf5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1424" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="일단">
@@ -13,119 +13,151 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon128.png">
 <link rel="apple-touch-icon" href="icon180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <style>
-  /* Layout: a quiet daily ledger led by one cobalt start card; a running timer takes over the screen. */
+  /* iOS 스타일: 시스템 폰트, 그룹형 카드 목록, 캡슐 버튼, 큰 제목. */
   :root {
-    --bg: #e9edf5; --surface: #f7f9fc; --ink: #131a2e; --muted: #586079; --line: #c9d1e0;
-    --accent: #1f3fd6; --on-accent: #ffffff;
-    --flood: #1f3fd6; --on-flood: #ffffff; --on-flood-muted: #d3dcff;
-    --h1: #1f3fd6; --h2: #c2410c; --h3: #0b7a75; --danger: #b42318;
-    --display: "Black Han Sans", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
-    --body: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    --bg: #f2f2f7; --surface: #ffffff; --fill: rgba(118,118,128,.12); --ink: #000000; --muted: rgba(60,60,67,.6); --line: rgba(60,60,67,.16);
+    --accent: #007aff; --on-accent: #ffffff; --tint: rgba(0,122,255,.12);
+    --flood: #0a5bd8; --on-flood: #ffffff; --on-flood-muted: rgba(255,255,255,.92);
+    --f-blue: #0a5bd8; --f-orange: #b84a08; --f-teal: #0b6f80; --f-rose: #cc2450; --f-violet: #8a3cc2; --f-green: #207a36; --f-gold: #946200;
+    --danger: #ff3b30; --switch-off: #e9e9eb; --switch-on: #34c759;
+    --c-blue: #007aff; --c-orange: #ff9500; --c-teal: #30b0c7; --c-rose: #ff2d55; --c-violet: #af52de; --c-green: #34c759; --c-gold: #ffcc00;
+    --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0f1424; --surface: #171e33; --ink: #e8ecf6; --muted: #a0aac4; --line: #2c3552;
-      --accent: #8ea6ff; --on-accent: #0f1424; --flood: #2440c9;
-      --h1: #8ea6ff; --h2: #ff9a66; --h3: #4fd1c5; --danger: #ff9c8f; color-scheme: dark;
+      --bg: #000000; --surface: #1c1c1e; --fill: rgba(118,118,128,.24); --ink: #ffffff; --muted: rgba(235,235,245,.6); --line: rgba(84,84,88,.55);
+      --accent: #0a84ff; --tint: rgba(10,132,255,.22); --danger: #ff453a; --switch-off: #39393d; --switch-on: #30d158; color-scheme: dark;
+      --c-blue: #0a84ff; --c-orange: #ff9f0a; --c-teal: #40c8e0; --c-rose: #ff375f; --c-violet: #bf5af2; --c-green: #30d158; --c-gold: #ffd60a;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0f1424; --surface: #171e33; --ink: #e8ecf6; --muted: #a0aac4; --line: #2c3552;
-    --accent: #8ea6ff; --on-accent: #0f1424; --flood: #2440c9;
-    --h1: #8ea6ff; --h2: #ff9a66; --h3: #4fd1c5; --danger: #ff9c8f; color-scheme: dark;
+    --bg: #000000; --surface: #1c1c1e; --fill: rgba(118,118,128,.24); --ink: #ffffff; --muted: rgba(235,235,245,.6); --line: rgba(84,84,88,.55);
+    --accent: #0a84ff; --tint: rgba(10,132,255,.22); --danger: #ff453a; --switch-off: #39393d; --switch-on: #30d158; color-scheme: dark;
+    --c-blue: #0a84ff; --c-orange: #ff9f0a; --c-teal: #40c8e0; --c-rose: #ff375f; --c-violet: #bf5af2; --c-green: #30d158; --c-gold: #ffd60a;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55;
-    word-break: keep-all; overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.4; letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
   body:has(.flood) { overflow: hidden; }
-  button, input { font: inherit; color: inherit; }
-  button { cursor: pointer; border: 0; border-radius: 6px; padding: 9px 14px; min-height: 44px; font-weight: 500;
-    background: transparent; box-shadow: inset 0 0 0 1px var(--line); touch-action: manipulation; }
-  button:active { opacity: .75; }
-  button.solid { background: var(--accent); color: var(--on-accent); box-shadow: none; font-weight: 700; }
+  a { color: var(--accent); } a:hover { color: var(--accent); opacity: .8; }
+  button, input { font: inherit; color: inherit; letter-spacing: inherit; }
+  button { cursor: pointer; border: 0; border-radius: 999px; padding: 8px 16px; min-height: 44px; font-size: 15px; font-weight: 600;
+    background: var(--fill); color: var(--accent); box-shadow: none; touch-action: manipulation; transition: opacity .15s, transform .15s; }
+  button:active { opacity: .55; transform: scale(.98); }
+  button:disabled { opacity: .3; cursor: default; }
+  button.solid { background: var(--accent); color: var(--on-accent); }
   button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  input { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px;
-    background: var(--surface); font-size: 16px; } /* 16px 미만이면 아이폰이 입력 시 화면을 확대한다. */
-  label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  input { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 10px;
+    background: var(--fill); font-size: 17px; } /* 16px 미만이면 아이폰이 입력 시 화면을 확대한다. */
+  input::placeholder { color: var(--muted); }
+  label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
 
-  .page { max-width: 44rem; margin: 0 auto; display: grid; gap: 32px;
-    padding-block: calc(28px + env(safe-area-inset-top, 0px)) calc(56px + env(safe-area-inset-bottom, 0px));
+  .page { max-width: 40rem; margin: 0 auto; display: grid; gap: 28px;
+    padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(48px + env(safe-area-inset-bottom, 0px));
     padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-  header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px; }
-  .brand { font-family: var(--display); font-size: 1.75rem; margin: 0; font-weight: 400; }
-  .date { color: var(--muted); font-size: 14px; }
-  .next { font-size: 1.15rem; margin: 6px 0 0; width: 100%; text-wrap: balance; }
-  h2 { font-size: 13px; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 500; }
+  header { display: flex; flex-direction: column; gap: 2px; padding: 0 4px; }
+  .date { order: -1; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .brand { font-family: var(--display); font-size: 34px; line-height: 1.2; letter-spacing: .01em; margin: 0; font-weight: 700; }
+  .next { font-size: 17px; color: var(--muted); margin: 2px 0 0; text-wrap: pretty; }
+  h2 { font-size: 13px; letter-spacing: 0; color: var(--muted); margin: 0 0 7px; padding: 0 16px; font-weight: 400; }
 
-  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
-  .row:last-child { border-bottom: 1px solid var(--line); }
+  #today { background: var(--surface); border-radius: 12px; overflow: hidden; }
+  .row { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; }
+  .row + .row::before { content: ""; position: absolute; top: 0; left: 34px; right: 0; height: 1px; background: var(--line); }
   .name { flex: 1 1 8rem; min-width: 0; }
-  .name strong { display: block; font-weight: 700; }
-  .name small { display: block; color: var(--muted); font-size: 13px; }
-  .actions { display: flex; gap: 6px; }
-  .reset-all { margin-top: 14px; color: var(--muted); }
-  .stamp { font-weight: 700; color: var(--accent); padding: 8px 0; }
-  .stamp.skipped { color: var(--muted); font-weight: 500; }
+  .name strong { display: flex; align-items: center; font-weight: 600; font-size: 17px; }
+  .name small { display: block; color: var(--muted); font-size: 15px; padding-left: 18px; margin-top: 1px; }
+  .actions { display: flex; gap: 8px; }
+  .reset-all { margin-top: 12px; width: 100%; min-height: 48px; border-radius: 12px; background: var(--surface); color: var(--danger); font-size: 17px; font-weight: 400; }
+  .stamp { font-weight: 600; font-size: 15px; color: var(--accent); }
+  .stamp.skipped { color: var(--muted); font-weight: 400; }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  section[aria-labelledby="monthTitle"] { background: var(--surface); border-radius: 12px; padding: 12px 12px 14px; }
+  .month-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .month-head h2 { margin: 0; flex: 1 1 auto; padding: 0 4px; color: var(--ink); font-size: 17px; font-weight: 600; }
+  .month-head button { width: 36px; min-height: 36px; height: 36px; padding: 0; font-size: 22px; line-height: 1; display: grid; place-items: center; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); margin: 0 4px 12px; font-variant-numeric: tabular-nums; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .pip { width: 8px; height: 8px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px var(--line); }
-  .pip.h0.on { background: var(--h1); box-shadow: none; }
-  .pip.h1.on { background: var(--h2); box-shadow: none; }
-  .pip.h2.on { background: var(--h3); box-shadow: none; }
-  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
-  .dow { text-align: center; font-size: 12px; color: var(--muted); }
-  .day { background: var(--surface); border-radius: 4px; padding: 5px 4px 7px; display: grid; gap: 4px; justify-items: center; font-size: 12px;
-    color: var(--muted); font-variant-numeric: tabular-nums; min-width: 0; }
-  .day.today { box-shadow: inset 0 0 0 2px var(--accent); color: var(--ink); font-weight: 700; }
-  .pips { display: flex; gap: 2px; }
+  .pip { width: 6px; height: 6px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px var(--line); }
+  .pip.on { background: var(--pc); box-shadow: none; }
+  .legend .pip { width: 8px; height: 8px; }
+  .name .pip { width: 10px; height: 10px; margin-right: 8px; background: var(--pc); box-shadow: none; flex: none; }
+  .swatches { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 2px; }
+  .swatch { width: 40px; min-height: 40px; padding: 0; background: transparent; display: grid; place-items: center; }
+  .swatch::before { content: ""; width: 26px; height: 26px; border-radius: 50%; background: var(--pc); }
+  .swatch[aria-pressed="true"]::before { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--pc); }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px 2px; }
+  .dow { text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); padding-bottom: 2px; }
+  .day { border-radius: 10px; padding: 6px 2px 7px; display: grid; gap: 4px; justify-items: center; font-size: 15px;
+    color: var(--ink); font-variant-numeric: tabular-nums; min-width: 0; }
+  .day.today { background: var(--tint); color: var(--accent); font-weight: 700; }
+  .pips { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; min-height: 6px; }
 
-  details { border-top: 1px solid var(--line); padding-top: 2px; }
-  summary { cursor: pointer; color: var(--muted); min-height: 44px; display: flex; align-items: center; gap: 8px; }
-  summary::before { content: "▸"; }
-  details[open] summary::before { content: "▾"; }
+  details { background: var(--surface); border-radius: 12px; padding: 0 16px; }
+  summary { cursor: pointer; color: var(--ink); min-height: 50px; display: flex; align-items: center; justify-content: space-between; list-style: none; }
+  summary::after { content: "›"; color: var(--muted); font-size: 24px; line-height: 1; transition: transform .2s; }
+  details[open] summary::after { transform: rotate(90deg); }
   summary::-webkit-details-marker { display: none; }
-  .settings { display: grid; gap: 14px; margin-top: 4px; }
-  .habit { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 6px; }
+  .settings { display: grid; gap: 22px; padding: 4px 0 16px; }
+  .settings h2 { padding: 0 4px; }
+  .habit { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 8px; padding: 12px; background: var(--bg); border-radius: 12px; }
+  .weekdays { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; max-width: 22rem; }
+  .weekday { padding: 0; min-height: 40px; color: var(--ink); background: var(--fill); font-weight: 500; }
+  .weekday[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+  .habit-tools { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .habit-tools input { width: 5rem; text-align: center; }
+  .habit-tools .spacer { flex: 1 1 auto; }
+  .habit-tools button { min-width: 44px; padding: 8px 12px; }
+  .habit-tools button:last-child { color: var(--danger); }
+  #addHabit { width: 100%; }
+  label.check { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: 10px; min-height: 44px; font-size: 17px; color: var(--ink); }
+  label.check input { -webkit-appearance: none; appearance: none; width: 51px; min-height: 31px; height: 31px; padding: 0; flex: none; border-radius: 999px; cursor: pointer;
+    background: radial-gradient(circle at 15.5px 50%, #fff 12.5px, transparent 13.5px), var(--switch-off); transition: background-color .2s; }
+  label.check input:checked { background: radial-gradient(circle at calc(100% - 15.5px) 50%, #fff 12.5px, transparent 13.5px), var(--switch-on); }
   .numbers { display: grid; grid-template-columns: minmax(0, 10rem); gap: 10px; }
-  .help { color: var(--muted); font-size: 14px; margin: 8px 0 0; max-width: 62ch; }
-  .notice { color: var(--danger); font-size: 14px; margin: 0; }
-  .saved { color: var(--muted); font-size: 14px; }
-  .connect { display: grid; gap: 8px; padding: 14px; background: var(--surface); border-radius: 6px; }
+  .help { color: var(--muted); font-size: 13px; line-height: 1.45; margin: 8px 4px 0; max-width: 62ch; }
+  .notice { color: var(--danger); font-size: 15px; margin: 0; padding: 0 16px; }
+  .saved { color: var(--muted); font-size: 13px; }
+  .settings .actions { flex-wrap: wrap; align-items: center; }
+  #saveSettings { width: 100%; min-height: 50px; border-radius: 14px; font-size: 17px; }
+  #disconnect { width: 100%; min-height: 48px; border-radius: 14px; }
+  .connect { display: grid; gap: 10px; padding: 16px; background: var(--surface); border-radius: 12px; }
+  .connect h2 { padding: 0; margin: 0; color: var(--ink); font-size: 17px; font-weight: 600; }
+  .connect .help { margin: 0; }
   .connect-row { display: flex; gap: 8px; }
+  .connect-row button { flex: none; }
   .connect-links { display: flex; flex-wrap: wrap; gap: 8px; }
-  .linkbutton { display: inline-flex; align-items: center; min-height: 44px; padding: 9px 14px; border-radius: 6px; font-weight: 500;
-    color: var(--accent); text-decoration: none; box-shadow: inset 0 0 0 1px var(--accent); touch-action: manipulation; }
+  .linkbutton { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 16px; border-radius: 999px; font-size: 15px; font-weight: 600;
+    color: var(--accent); background: var(--fill); text-decoration: none; touch-action: manipulation; }
   .linkbutton:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
   .flood { position: fixed; inset: 0; z-index: 5; overflow: auto; overscroll-behavior: contain; background: var(--flood); color: var(--on-flood);
     display: grid; align-content: safe center; justify-items: start;
     padding: calc(24px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px)); }
-  .poster { width: 100%; max-width: 44rem; margin: 0 auto; display: grid; gap: 8px; justify-items: start; }
-  .eyebrow { color: var(--on-flood-muted); font-size: 1.05rem; }
-  .hero { display: grid; gap: 4px; justify-items: start; padding: 20px; border-radius: 8px; background: var(--flood); color: var(--on-flood); }
-  .hero-label { color: var(--on-flood-muted); font-size: 14px; }
-  .hero-name { font-family: var(--display); font-size: clamp(2.6rem, 11vw, 4rem); line-height: 1.1; overflow-wrap: anywhere; }
-  .hero-step { font-weight: 700; font-size: 1.1rem; text-wrap: balance; }
-  .hero-note { color: var(--on-flood-muted); font-size: 14px; }
-  .hero button { margin-top: 12px; min-height: 56px; padding: 12px 32px; background: var(--on-flood); color: #1f3fd6;
-    box-shadow: none; font-size: 1.2rem; font-weight: 700; }
+  .poster { width: 100%; max-width: 40rem; margin: 0 auto; display: grid; gap: 8px; justify-items: start; }
+  .eyebrow { color: var(--on-flood-muted); font-size: 17px; font-weight: 600; }
+  .hero { display: grid; gap: 4px; justify-items: start; padding: 20px; border-radius: 22px; background: var(--flood); color: var(--on-flood);
+    box-shadow: 0 12px 28px -16px rgba(0,0,0,.45); }
+  .hero-label { color: var(--on-flood-muted); font-size: 13px; font-weight: 600; }
+  .hero-name { font-family: var(--display); font-weight: 800; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: 1.1; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+  .hero-step { font-weight: 600; font-size: 17px; text-wrap: pretty; }
+  .hero-note { color: var(--on-flood-muted); font-size: 15px; }
+  .hero button { margin-top: 16px; min-height: 52px; padding: 12px 28px; border-radius: 14px; background: var(--on-flood); color: var(--flood);
+    font-size: 17px; font-weight: 700; }
   .hero button:focus-visible { outline-color: var(--on-flood); }
-  .big { font-family: var(--display); font-size: clamp(4.5rem, 20vw, 10rem); line-height: 1.05; word-break: keep-all; overflow-wrap: anywhere; }
-  .step { font-size: clamp(1.25rem, 4vw, 1.7rem); font-weight: 700; text-wrap: balance; }
-  .small { color: var(--on-flood-muted); }
-  .flood button { box-shadow: inset 0 0 0 1px var(--on-flood-muted); color: var(--on-flood); }
-  .flood button.go { background: var(--on-flood); color: #1f3fd6; box-shadow: none; font-size: 1.35rem; font-weight: 700; padding: 16px 32px; margin-top: 14px; }
+  .big { font-family: var(--display); font-weight: 800; letter-spacing: -0.03em; font-size: clamp(4.5rem, 22vw, 9rem); line-height: 1.05; overflow-wrap: anywhere; }
+  .step { font-size: clamp(1.25rem, 4vw, 1.6rem); font-weight: 600; text-wrap: pretty; }
+  .small { color: var(--on-flood-muted); font-size: 15px; }
+  .flood button { background: rgba(255,255,255,.18); color: var(--on-flood); border-radius: 14px; min-height: 52px; font-size: 17px; }
+  .flood button.go { background: var(--on-flood); color: var(--flood); font-size: 19px; font-weight: 700; padding: 16px 32px; margin-top: 16px; border-radius: 16px; }
   .flood button.go:focus-visible, .flood button:focus-visible { outline-color: var(--on-flood); }
-  .flood .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-  .clock { font-family: var(--display); font-size: clamp(4rem, 24vw, 13rem); line-height: 1; font-variant-numeric: tabular-nums; }
+  .flood .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .clock { font-family: var(--display); font-weight: 200; letter-spacing: -0.03em; font-size: clamp(4.5rem, 26vw, 12rem); line-height: 1; font-variant-numeric: tabular-nums; }
 
-  /* 터치 기기에서는 PC 전용 알림 안내를 숨긴다. */
   @media (pointer: coarse) { #alertSection { display: none; } }
 
   /* 휴대폰 세로: 내용은 위, 버튼은 엄지가 닿는 아래. */
@@ -133,8 +165,8 @@
     .flood { display: flex; flex-direction: column; align-items: stretch; }
     .poster { flex: 1 0 auto; display: flex; flex-direction: column; align-items: stretch; max-width: none; }
     .poster > :first-child { margin-top: 12vh; }
-    .flood button.go { width: 100%; margin-top: auto; min-height: 60px; }
-    .flood .buttons { display: flex; margin-top: 2px; }
+    .flood button.go { width: 100%; margin-top: auto; min-height: 58px; }
+    .flood .buttons { display: flex; margin-top: 0; }
     .flood .buttons button { flex: 1 1 40%; }
     .flood .buttons.end { margin-top: auto; }
   }
@@ -144,31 +176,27 @@
     .flood { padding-block: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); }
     .poster { max-width: none; grid-template-columns: minmax(0, 1fr) minmax(0, 15rem); column-gap: 20px; align-items: center; row-gap: 2px; }
     .poster > * { grid-column: 1; }
-    .eyebrow { font-size: .95rem; }
+    .eyebrow { font-size: 15px; }
     .big { font-size: clamp(2.6rem, 22vh, 5rem); }
-    .step { font-size: 1.1rem; }
+    .step { font-size: 17px; }
     .clock { font-size: clamp(3.5rem, 34vh, 7rem); }
-    .flood button.go { grid-column: 2; grid-row: 1 / span 3; align-self: end; width: 100%; margin-top: 0; padding: 12px; font-size: 1.15rem; }
+    .flood button.go { grid-column: 2; grid-row: 1 / span 3; align-self: end; width: 100%; margin-top: 0; padding: 12px; font-size: 17px; }
     .flood .buttons { grid-column: 2; grid-row: 4 / span 3; align-self: start; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
-    .flood .buttons button { padding-inline: 6px; font-size: 14px; }
+    .flood .buttons button { padding-inline: 6px; font-size: 15px; }
     .flood .buttons button:only-child { grid-column: 1 / -1; }
   }
 
   /* 좁은 화면의 홈과 설정. */
   @media (max-width: 30rem) {
-    .page { gap: 26px; }
-    .row { gap: 8px 10px; }
-    .actions { flex: 1 1 100%; }
+    .page { gap: 24px; }
+    .actions { flex: 1 1 100%; padding-left: 18px; }
     .actions button { flex: 1 1 0; }
     .row .stamp { margin-left: auto; }
     .habit { grid-template-columns: minmax(0, 1fr); }
     .hero button { width: 100%; }
-    .settings .actions { flex-wrap: wrap; }
-    .settings .actions button { flex: 1 1 100%; }
-    #saveSettings, #disconnect, #localOnly, .linkbutton, .reset-all { width: 100%; justify-content: center; }
-    #connectButton { flex: none; }
+    .settings .actions { padding-left: 0; }
+    .linkbutton, #localOnly { width: 100%; }
     .connect-links { display: grid; }
-    label { font-size: 12px; }
   }
 </style>
 </head>
@@ -201,7 +229,11 @@
     <button class="reset-all" id="resetAll" type="button" hidden>오늘 기록 전체 초기화</button>
   </section>
   <section aria-labelledby="monthTitle">
-    <h2 id="monthTitle">이번 달</h2>
+    <div class="month-head">
+      <h2 id="monthTitle">이번 달</h2>
+      <button id="prevMonth" type="button" aria-label="이전 달">‹</button>
+      <button id="nextMonth" type="button" aria-label="다음 달">›</button>
+    </div>
     <div class="legend" id="legend"></div>
     <div class="cal" id="calendar"></div>
   </section>
@@ -216,11 +248,12 @@
         <h2>할 일</h2>
         <div id="habitFields" style="display:grid;gap:8px"></div>
         <button id="addHabit" type="button" style="margin-top:8px">할 일 추가</button>
-        <p class="help">첫 단계는 하기 싫은 날에도 할 수 있을 만큼 작게 잡으세요.</p>
+        <p class="help">첫 단계는 하기 싫은 날에도 할 수 있을 만큼 작게 잡으세요. 요일은 하나 이상 골라야 하고, 할 일별 타이머를 비워 두면 기본 타이머를 씁니다. 바꾼 내용은 저장을 눌러야 반영됩니다. 삭제해도 지난 기록은 달력에 남고, 같은 이름으로 다시 만들면 이어집니다.</p>
       </div>
       <div class="numbers">
-        <label>타이머(분)<input id="startMinutes" type="number" inputmode="numeric" min="1" max="60" required></label>
+        <label>기본 타이머(분)<input id="startMinutes" type="number" inputmode="numeric" min="1" max="60" required></label>
       </div>
+      <label class="check"><input id="countdownOn" type="checkbox">시작 전 5초 카운트다운</label>
       <div class="actions">
         <button class="solid" type="submit" id="saveSettings">저장</button>
         <span class="saved" id="savedMessage" role="status"></span>
@@ -234,16 +267,22 @@
 (() => {
   const DEFAULTS = {
     startMinutes: 2,
+    countdown: true,
+    archived: [],
     habits: [
-      { id: "study", name: "공부", firstStep: "책 펴고 한 문단만 읽기" },
-      { id: "exercise", name: "운동", firstStep: "운동복 입고 스쿼트 5개" },
-      { id: "clean", name: "청소", firstStep: "눈에 보이는 물건 3개 제자리에 두기" },
-      { id: "meditate", name: "명상", firstStep: "자리에 앉아 눈 감고 숨 다섯 번 세기" },
+      { id: "study", color: "blue", name: "공부", firstStep: "책 펴고 한 문단만 읽기" },
+      { id: "exercise", color: "orange", name: "운동", firstStep: "운동복 입고 스쿼트 5개" },
+      { id: "clean", color: "teal", name: "청소", firstStep: "눈에 보이는 물건 3개 제자리에 두기" },
+      { id: "meditate", color: "rose", name: "명상", firstStep: "자리에 앉아 눈 감고 숨 다섯 번 세기" },
     ],
   };
-  const MINUTE = 60000, DAY_START_HOUR = 4, DAY_MS = 86400000;
+  const MINUTE = 60000, DAY_START_HOUR = 4, DAY_MS = 86400000, COUNTDOWN_SECONDS = 5;
   const $ = (id) => document.getElementById(id);
   const pad = (n) => String(n).padStart(2, "0");
+  const COLORS = [["blue", "파랑"], ["orange", "주황"], ["teal", "청록"], ["rose", "분홍"], ["violet", "보라"], ["green", "초록"], ["gold", "노랑"]];
+  const colorOf = (habit, i) => (COLORS.some(([key]) => key === habit.color) ? habit.color : COLORS[i % COLORS.length][0]);
+  const paintColor = (node, color) => { node.style.setProperty("--pc", `var(--c-${color})`); return node; };
+  const paintFlood = (node, habit) => { node.style.setProperty("--flood", `var(--f-${colorOf(habit, config.habits.indexOf(habit))})`); return node; };
 
   // ---------- 판단 로직 ----------
   function dayKey(ms) {
@@ -251,10 +290,16 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
   const isFinished = (entry) => entry?.status === "done" || entry?.status === "skipped";
-  function missedYesterday(ms, id) {
-    const today = dayKey(ms);
+  function weekdayOf(key) {
+    const [year, month, date] = key.split("-").map(Number);
+    return new Date(year, month - 1, date).getDay();
+  }
+  const scheduledOn = (habit, key) => !habit.weekdays || habit.weekdays.includes(weekdayOf(key));
+  function missedYesterday(ms, habit) {
+    const today = dayKey(ms), yesterday = dayKey(ms - DAY_MS);
     if (!Object.keys(days).some((day) => day < today)) return false;
-    return days[dayKey(ms - DAY_MS)]?.[id]?.status !== "done";
+    if ((habit.since && yesterday < habit.since) || !scheduledOn(habit, yesterday)) return false;
+    return !isFinished(days[yesterday]?.[habit.id]);
   }
   const durationText = (m) => (m >= 1 ? `${m}분` : `${Math.round(m * 60)}초`);
   const clockText = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
@@ -273,8 +318,7 @@
     put("app/session", session);
     render();
   }
-  function setEntry(habitId, patch, ms = Date.now()) {
-    const key = dayKey(ms);
+  function setEntry(habitId, patch, ms = Date.now(), key = dayKey(ms)) {
     const day = { ...days[key], [habitId]: { ...days[key]?.[habitId], ...patch, at: ms } };
     days = { ...days, [key]: day };
     put(`days/${key}`, day);
@@ -296,8 +340,8 @@
     render();
     confirmTimer = setTimeout(() => { confirming = null; render(); }, 4000);
   }
-  const entryOf = (id, ms = Date.now()) => days[dayKey(ms)]?.[id] ?? {};
   const currentHabit = () => config.habits.find((h) => h.id === session.habitId);
+  const minutesOf = (habit) => habit.minutes ?? config.startMinutes;
 
   // ---------- 알림 ----------
   let audio = null;
@@ -335,25 +379,53 @@
   });
 
   // ---------- 행동 ----------
+  // 시작 카운트다운은 이 화면에서만 돌고 저장하지 않는다. 도중에 닫히면 처음 상태로 돌아간다.
+  let countdown = null;
   function startTimer(habitId) {
-    setSession({ habitId, phase: "timer", day: dayKey(Date.now()), finishAt: Date.now() + config.startMinutes * MINUTE });
+    if (!config.countdown) { beginTimer(habitId); return; }
+    countdown = { habitId, endAt: Date.now() + COUNTDOWN_SECONDS * 1000 };
+    render();
   }
+  function beginTimer(habitId) {
+    countdown = null;
+    const habit = config.habits.find((h) => h.id === habitId);
+    const minutes = habit ? minutesOf(habit) : config.startMinutes;
+    setSession({ habitId, phase: "timer", day: dayKey(Date.now()), minutes, finishAt: Date.now() + minutes * MINUTE });
+  }
+  // 앱을 닫아 둔 사이 끝난 타이머도 시작한 날의 기록으로 남긴다.
   function finishTimer(minutes, ring) {
     if (session.phase !== "timer") return;
-    const entry = entryOf(session.habitId);
+    const entry = days[session.day]?.[session.habitId] ?? {};
     const earlier = entry.status === "done" ? entry.minutes ?? 0 : 0; // 다시 시작한 시간은 그날 기록에 더한다.
-    setEntry(session.habitId, { status: "done", minutes: earlier + Math.max(1, minutes) });
+    setEntry(session.habitId, { status: "done", minutes: earlier + Math.max(1, minutes) }, Math.min(Date.now(), session.finishAt), session.day);
     setSession({ phase: "done" });
-    if (ring) alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
+    if (ring && session.day === dayKey(Date.now())) alertUser(`${currentHabit()?.name ?? ""} 성공. 오늘 칸이 채워졌습니다.`);
   }
-  const completeTimer = () => finishTimer(Math.round(config.startMinutes), true);
+  const timerMinutes = () => session.minutes ?? config.startMinutes;
+  const completeTimer = () => finishTimer(Math.round(timerMinutes()), true);
   // 타이머가 끝나기 전에 다 했을 때: 지난 시간만큼 기록한다.
-  const finishEarly = () => finishTimer(Math.round((Date.now() - (session.finishAt - config.startMinutes * MINUTE)) / MINUTE), false);
+  const finishEarly = () => finishTimer(Math.round((Date.now() - (session.finishAt - timerMinutes() * MINUTE)) / MINUTE), false);
   function finishExtra() {
-    const entry = entryOf(session.habitId);
+    const entry = days[session.day]?.[session.habitId] ?? {};
     const added = Math.round((Date.now() - session.startedAt) / MINUTE);
-    setEntry(session.habitId, { minutes: (entry.minutes ?? 0) + added });
+    setEntry(session.habitId, { minutes: (entry.minutes ?? 0) + added }, Date.now(), session.day);
     setSession({ phase: null });
+  }
+  const skipToday = (habitId) => { setEntry(habitId, { status: "skipped" }); render(); };
+
+  // 타이머가 도는 동안 화면이 꺼지면 시계와 종료음이 멈추므로 켜 둔다. 지원하지 않는 브라우저에서는 그냥 넘어간다.
+  let wakeLock = null, wakeWanted = false;
+  async function keepAwake(on) {
+    wakeWanted = on;
+    if (!on) { wakeLock?.release(); wakeLock = null; return; }
+    if (wakeLock || document.hidden) return;
+    try {
+      const lock = await navigator.wakeLock?.request("screen");
+      if (!lock) return;
+      if (!wakeWanted) { lock.release(); return; }
+      wakeLock = lock;
+      lock.addEventListener("release", () => { if (wakeLock === lock) wakeLock = null; });
+    } catch {}
   }
 
   // 타이머가 끝났는지 확인하고, 어제 남은 화면이나 이전 버전의 자동 화면을 닫는다.
@@ -376,6 +448,23 @@
     node.type = "button";
     node.addEventListener("click", onClick);
     return node;
+  }
+
+  function countdownView(habit) {
+    const poster = el("div", "poster");
+    const number = el("div", "big");
+    const paint = () => {
+      const left = Math.ceil((countdown.endAt - Date.now()) / 1000);
+      if (left <= 0) { beep(); beginTimer(habit.id); return; }
+      if (number.textContent !== String(left)) number.textContent = String(left);
+    };
+    paint();
+    ticker = setInterval(paint, 100);
+    const buttons = el("div", "buttons");
+    buttons.append(btn("취소", "", () => { countdown = null; render(); }));
+    poster.append(el("div", "eyebrow", habit.name), number, el("div", "step", habit.firstStep),
+      btn("바로 시작", "go", () => beginTimer(habit.id)), buttons);
+    return poster;
   }
 
   function timerView(habit) {
@@ -413,28 +502,34 @@
   }
 
   function renderStage() {
-    const habit = currentHabit();
-    const phase = habit ? session.phase : null;
-    const key = JSON.stringify([phase, habit, session.finishAt, session.startedAt, config.startMinutes]);
+    if (countdown && !config.habits.some((h) => h.id === countdown.habitId)) countdown = null;
+    const habit = countdown ? config.habits.find((h) => h.id === countdown.habitId) : currentHabit();
+    const phase = countdown ? "countdown" : habit ? session.phase : null;
+    const key = JSON.stringify([phase, habit, session.finishAt, session.startedAt, config.startMinutes, countdown?.endAt]);
     if (key === stageKey) return;
     stageKey = key;
+    keepAwake(["countdown", "timer", "extra"].includes(phase));
     clearInterval(ticker);
     $("stage").replaceChildren();
     $("home").inert = Boolean(phase);
     if (!phase) return;
-    const view = { timer: timerView, done: doneView, extra: extraView }[phase];
+    const view = { countdown: countdownView, timer: timerView, done: doneView, extra: extraView }[phase];
     if (!view) return;
-    const flood = el("div", "flood");
+    const flood = paintFlood(el("div", "flood"), habit);
     flood.append(view(habit));
     $("stage").append(flood);
   }
 
   function renderToday(now) {
-    const today = days[dayKey(now)] ?? {};
-    const rows = config.habits.map((habit) => {
+    const key = dayKey(now), today = days[key] ?? {};
+    const scheduled = config.habits.filter((h) => scheduledOn(h, key));
+    const resting = config.habits.filter((h) => !scheduledOn(h, key));
+    const rows = [...scheduled, ...resting].map((habit) => {
       const row = el("div", "row");
       const name = el("div", "name");
-      name.append(el("strong", "", habit.name), el("small", "", habit.firstStep));
+      const title = el("strong");
+      title.append(paintColor(el("i", "pip"), colorOf(habit, config.habits.indexOf(habit))), habit.name);
+      name.append(title, el("small", "", habit.firstStep));
       row.append(name);
       const status = today[habit.id]?.status;
       const actions = el("div", "actions");
@@ -443,8 +538,11 @@
         row.append(el("span", `stamp ${status}`, status === "done" ? `완료${minutes ? ` · ${minutes}분` : ""}` : "건너뜀"));
         actions.append(btn("다시 시작", "", () => startTimer(habit.id)),
           btn(confirming === habit.id ? "정말 초기화" : "초기화", "", () => confirmThen(habit.id, () => resetHabits([habit.id]))));
+      } else if (scheduledOn(habit, key)) {
+        actions.append(btn("시작", "solid", () => startTimer(habit.id)), btn("건너뛰기", "", () => skipToday(habit.id)));
       } else {
-        actions.append(btn("시작", "solid", () => startTimer(habit.id)));
+        row.append(el("span", "stamp skipped", "쉬는 날"));
+        actions.append(btn("시작", "", () => startTimer(habit.id)));
       }
       row.append(actions);
       return row;
@@ -454,10 +552,11 @@
     $("resetAll").hidden = !anyRecord;
     $("resetAll").textContent = confirming === "all" ? "정말 오늘 기록을 모두 초기화" : "오늘 기록 전체 초기화";
 
-    const waiting = config.habits.filter((h) => !isFinished(today[h.id]));
-    const finished = config.habits.length - waiting.length;
-    $("next").textContent = waiting.length
-      ? (finished ? `${config.habits.length}개 중 ${finished}개를 마쳤습니다.` : "언제든 시작할 수 있습니다.")
+    const waiting = scheduled.filter((h) => !isFinished(today[h.id]));
+    const finished = scheduled.length - waiting.length;
+    $("next").textContent = !config.habits.length ? "할 일이 없습니다. 설정에서 추가해 보세요."
+      : !scheduled.length ? "오늘은 쉬는 날입니다."
+      : waiting.length ? (finished ? `${scheduled.length}개 중 ${finished}개를 마쳤습니다.` : "언제든 시작할 수 있습니다.")
       : "오늘 할 일을 모두 마쳤습니다.";
     renderHero(waiting[0], now);
   }
@@ -466,43 +565,60 @@
     const hero = $("hero");
     hero.hidden = !habit;
     if (!habit) { hero.replaceChildren(); return; }
-    const duration = durationText(config.startMinutes);
+    paintFlood(hero, habit);
+    const duration = durationText(minutesOf(habit));
     const nodes = [el("div", "hero-label", "다음 할 일"), el("div", "hero-name", habit.name), el("div", "hero-step", habit.firstStep)];
-    if (missedYesterday(now, habit.id)) nodes.push(el("div", "hero-note", "어제 빠져도 괜찮아요. 오늘 하면 다시 이어집니다."));
+    if (missedYesterday(now, habit)) nodes.push(el("div", "hero-note", "어제 빠져도 괜찮아요. 오늘 하면 다시 이어집니다."));
     nodes.push(btn(`${duration}만 시작`, "", () => startTimer(habit.id)));
     hero.replaceChildren(...nodes);
   }
 
+  let monthOffset = 0;
   function renderMonth(now) {
-    const key = dayKey(now), [year, month] = key.split("-").map(Number);
-    const counts = config.habits.map((h) => Object.entries(days)
-      .filter(([day, e]) => day.startsWith(key.slice(0, 7)) && e[h.id]?.status === "done").length);
-    $("legend").replaceChildren(...config.habits.map((h, i) => {
+    const key = dayKey(now), [thisYear, thisMonth] = key.split("-").map(Number);
+    const first = new Date(thisYear, thisMonth - 1 + monthOffset, 1);
+    const year = first.getFullYear(), month = first.getMonth() + 1, prefix = `${year}-${pad(month)}`;
+    const entries = Object.entries(days).filter(([day]) => day.startsWith(prefix));
+    const countOf = (h) => entries.filter(([, e]) => e[h.id]?.status === "done").length;
+    // 삭제한 할 일은 그달에 기록이 있을 때만 달력에 남긴다.
+    const shown = [...config.habits.map((h, i) => ({ ...h, color: colorOf(h, i) })),
+      ...(config.archived ?? []).filter((h) => countOf(h)).map((h) => ({ ...h, label: `${h.name}(삭제됨)` }))];
+    $("legend").replaceChildren(...shown.map((h) => {
       const item = el("span");
-      item.append(el("i", `pip h${i % 3} on`), `${h.name} ${counts[i]}일`);
+      item.append(paintColor(el("i", "pip on"), h.color), `${h.label ?? h.name} ${countOf(h)}일`);
       return item;
     }));
     const cells = ["일", "월", "화", "수", "목", "금", "토"].map((d) => el("div", "dow", d));
-    const lead = new Date(year, month - 1, 1).getDay();
+    const lead = first.getDay();
     for (let i = 0; i < lead; i++) cells.push(el("div"));
     const total = new Date(year, month, 0).getDate();
     for (let d = 1; d <= total; d++) {
-      const dayId = `${year}-${pad(month)}-${pad(d)}`;
+      const dayId = `${prefix}-${pad(d)}`;
       const cell = el("div", `day${dayId === key ? " today" : ""}`, String(d));
       const pips = el("div", "pips");
-      config.habits.forEach((h, i) => pips.append(el("i", `pip h${i % 3}${days[dayId]?.[h.id]?.status === "done" ? " on" : ""}`)));
+      shown.forEach((h) => {
+        const done = days[dayId]?.[h.id]?.status === "done";
+        if (done || (!h.label && scheduledOn(h, dayId))) pips.append(paintColor(el("i", `pip${done ? " on" : ""}`), h.color));
+      });
       cell.append(pips);
       cells.push(cell);
     }
     $("calendar").replaceChildren(...cells);
     const shifted = new Date(now - DAY_START_HOUR * 3600000);
-    $("date").textContent = `${month}월 ${shifted.getDate()}일 ${["일", "월", "화", "수", "목", "금", "토"][shifted.getDay()]}요일`;
-    $("monthTitle").textContent = `${month}월 기록`;
+    $("date").textContent = `${shifted.getMonth() + 1}월 ${shifted.getDate()}일 ${["일", "월", "화", "수", "목", "금", "토"][shifted.getDay()]}요일`;
+    $("monthTitle").textContent = monthOffset ? `${year}년 ${month}월 기록` : `${month}월 기록`;
+    $("nextMonth").disabled = monthOffset === 0;
   }
 
-  function habitRow(h) {
+  function markUnsaved() {
+    $("savedMessage").textContent = "저장하지 않은 변경이 있습니다.";
+  }
+  function habitRow(h, i) {
     const row = el("div", "habit");
+    const title = h.name || "새 할 일";
     row.dataset.id = h.id;
+    row.dataset.color = colorOf(h, i);
+    if (h.since) row.dataset.since = h.since;
     [["name", h.name, "이름"], ["firstStep", h.firstStep, "첫 단계"]]
       .forEach(([key, value, label]) => {
         const input = el("input");
@@ -511,39 +627,135 @@
         input.value = value;
         input.required = true;
         input.dataset.key = key;
-        input.setAttribute("aria-label", `${h.name || "새 할 일"} ${label}`);
+        input.setAttribute("aria-label", `${title} ${label}`);
         row.append(input);
       });
+
+    const weekdays = el("div", "weekdays");
+    weekdays.setAttribute("role", "group");
+    weekdays.setAttribute("aria-label", `${title} 요일`);
+    ["일", "월", "화", "수", "목", "금", "토"].forEach((label, day) => {
+      const toggle = btn(label, "weekday", () => {
+        const on = toggle.getAttribute("aria-pressed") === "true";
+        if (on && weekdays.querySelectorAll('[aria-pressed="true"]').length === 1) return; // 하나는 남긴다.
+        toggle.setAttribute("aria-pressed", String(!on));
+        markUnsaved();
+      });
+      toggle.dataset.day = day;
+      toggle.setAttribute("aria-label", `${label}요일`);
+      toggle.setAttribute("aria-pressed", String(!h.weekdays || h.weekdays.includes(day)));
+      weekdays.append(toggle);
+    });
+
+    const swatches = el("div", "swatches");
+    swatches.setAttribute("role", "group");
+    swatches.setAttribute("aria-label", `${title} 색`);
+    for (const [key, label] of COLORS) {
+      const swatch = btn("", "swatch", () => {
+        row.dataset.color = key;
+        swatches.querySelectorAll(".swatch").forEach((s) => s.setAttribute("aria-pressed", String(s === swatch)));
+        markUnsaved();
+      });
+      paintColor(swatch, key);
+      swatch.setAttribute("aria-label", label);
+      swatch.setAttribute("aria-pressed", String(key === row.dataset.color));
+      swatches.append(swatch);
+    }
+
+    const tools = el("div", "habit-tools");
+    const minutes = el("input");
+    minutes.type = "number";
+    minutes.inputMode = "numeric";
+    minutes.min = "1";
+    minutes.max = "60";
+    minutes.value = h.minutes ?? "";
+    minutes.placeholder = "기본";
+    minutes.dataset.key = "minutes";
+    minutes.setAttribute("aria-label", `${title} 타이머(분)`);
+    const move = (text, label, shift) => {
+      const node = btn(text, "", () => {
+        const target = shift < 0 ? row.previousElementSibling : row.nextElementSibling;
+        if (!target) return;
+        if (shift < 0) target.before(row); else target.after(row);
+        node.focus();
+        markUnsaved();
+      });
+      node.setAttribute("aria-label", `${title} ${label}`);
+      return node;
+    };
+    const remove = btn("삭제", "", () => {
+      const next = row.nextElementSibling ?? row.previousElementSibling;
+      row.remove();
+      (next?.querySelector("input") ?? $("addHabit")).focus();
+      markUnsaved();
+    });
+    remove.setAttribute("aria-label", `${title} 삭제`);
+    tools.append(el("span", "saved", "타이머(분)"), minutes, el("span", "spacer"), move("↑", "위로", -1), move("↓", "아래로", 1), remove);
+
+    row.append(weekdays, swatches, tools);
     return row;
   }
   function fillSettings() {
     $("habitFields").replaceChildren(...config.habits.map(habitRow));
     $("startMinutes").value = config.startMinutes;
+    $("countdownOn").checked = config.countdown !== false;
+    $("savedMessage").textContent = "";
   }
   $("addHabit").addEventListener("click", () => {
-    const row = habitRow({ id: `h${Date.now().toString(36)}`, name: "", firstStep: "" });
+    const rows = [...document.querySelectorAll(".habit")];
+    const unused = COLORS.find(([key]) => !rows.some((r) => r.dataset.color === key));
+    const color = (unused ?? COLORS[rows.length % COLORS.length])[0];
+    const row = habitRow({ id: `h${Date.now().toString(36)}`, name: "", firstStep: "", color, since: dayKey(Date.now()) }, rows.length);
     $("habitFields").append(row);
     row.querySelector("input").focus();
+    markUnsaved();
   });
+  $("settings").addEventListener("input", markUnsaved);
 
   function render() {
     const now = Date.now();
     renderStage();
     renderToday(now);
     renderMonth(now);
-    if (!settingsFilled) { fillSettings(); settingsFilled = appReady; }
+    if (!settingsFilled && !$("settingsBox").open) { fillSettings(); settingsFilled = true; }
   }
+
+  const sameHabit = (a, b) => ["color", "name", "firstStep", "minutes", "weekdays"]
+    .every((field) => JSON.stringify(a[field]) === JSON.stringify(b[field]));
+  $("prevMonth").addEventListener("click", () => { monthOffset -= 1; render(); });
+  $("nextMonth").addEventListener("click", () => { monthOffset = Math.min(0, monthOffset + 1); render(); });
 
   $("resetAll").addEventListener("click", () => confirmThen("all", () => resetHabits(config.habits.map((h) => h.id))));
 
   $("settings").addEventListener("submit", (event) => {
     event.preventDefault();
+    const now = Date.now(), before = config.habits;
+    let archived = [...(config.archived ?? [])];
     const habits = [...document.querySelectorAll(".habit")].map((row) => {
       const value = (key) => row.querySelector(`[data-key=${key}]`).value.trim();
-      return { id: row.dataset.id, name: value("name"), firstStep: value("firstStep") };
+      const weekdays = [...row.querySelectorAll('.weekday[aria-pressed="true"]')].map((node) => Number(node.dataset.day));
+      const habit = { id: row.dataset.id, color: row.dataset.color, name: value("name"), firstStep: value("firstStep") };
+      if (value("minutes")) habit.minutes = Number(value("minutes"));
+      if (weekdays.length < 7) habit.weekdays = weekdays;
+      if (row.dataset.since) habit.since = row.dataset.since;
+      const old = before.find((h) => h.id === habit.id);
+      if (!old) { // 같은 이름으로 다시 만들면 삭제했던 기록을 잇는다.
+        const back = archived.find((h) => h.name === habit.name);
+        if (back) {
+          habit.id = back.id;
+          if (back.since) habit.since = back.since;
+          archived = archived.filter((h) => h !== back);
+        }
+      }
+      return { ...habit, at: old && sameHabit(old, habit) ? old.at : now };
     });
-    config = { ...config, habits, startMinutes: Number($("startMinutes").value) };
+    before.forEach((h, i) => {
+      if (habits.some((kept) => kept.id === h.id)) return;
+      archived.push({ id: h.id, name: h.name, color: colorOf(h, i), ...(h.since && { since: h.since }), archivedAt: now });
+    });
+    config = { ...config, habits, archived, at: now, startMinutes: Number($("startMinutes").value), countdown: $("countdownOn").checked };
     put("app/config", config);
+    fillSettings();
     $("savedMessage").textContent = "저장했습니다.";
     render();
   });
@@ -614,7 +826,25 @@
     if (reset) out.resetAt = reset;
     return out;
   }
+  // 두 기기에서 설정을 고쳐도 할 일별로 합친다. 같은 할 일은 나중에 고친 쪽, 순서와 숫자는 나중에 저장한 쪽을 따른다.
+  function mergeConfig(remote, local) {
+    const [newer, older] = (local.at ?? 0) >= (remote.at ?? 0) ? [local, remote] : [remote, local];
+    const removed = new Map();
+    for (const h of [...(older.archived ?? []), ...(newer.archived ?? [])]) {
+      if (!removed.has(h.id) || removed.get(h.id).archivedAt < h.archivedAt) removed.set(h.id, h);
+    }
+    const others = new Map((older.habits ?? []).map((h) => [h.id, h]));
+    const habits = (newer.habits ?? []).map((h) => {
+      const other = others.get(h.id);
+      others.delete(h.id);
+      return other && (other.at ?? 0) > (h.at ?? 0) ? other : h;
+    });
+    habits.push(...others.values());
+    const live = habits.filter((h) => !(removed.get(h.id)?.archivedAt > (h.at ?? 0)));
+    return { ...newer, habits: live, archived: [...removed.values()].filter((h) => !live.some((kept) => kept.id === h.id)) };
+  }
   function mergeDoc(path, remote, local) {
+    if (path === "app/config" && remote) return mergeConfig(remote, local);
     if (!path.startsWith("days/") || !remote) return local;
     const day = { ...remote };
     for (const [id, entry] of Object.entries(local)) day[id] = mergeEntry(remote[id], entry);
@@ -628,6 +858,7 @@
     try {
       if (!gistId) gistId = await findGist();
       const gist = await github(`/gists/${gistId}`);
+      if (!gist.files[GIST_FILE]) throw new Error("HTTP 404");
       const merged = { ...JSON.parse(gist.files[GIST_FILE].content).docs };
       const sent = [...dirty].map((path) => [path, docs[path]]);
       for (const [path, body] of sent) merged[path] = mergeDoc(path, merged[path], body);
@@ -641,7 +872,7 @@
         const saved = JSON.parse((await github(`/gists/${gistId}`)).files[GIST_FILE].content).docs;
         for (const [path, body] of sent) {
           const kept = JSON.stringify(mergeDoc(path, saved[path], body)) === JSON.stringify(saved[path])
-            || !path.startsWith("days/");
+            || path === "app/session";
           if (kept && docs[path] === body) dirty.delete(path);
           if (!kept) syncAgain = true;
           merged[path] = mergeDoc(path, saved[path], body);
@@ -657,6 +888,9 @@
       if (error.message === "token") {
         forgetToken();
         showNotice("토큰이 맞지 않거나 만료되었습니다. 새 토큰을 넣어 주세요.");
+      } else if (error.message === "HTTP 404" && gistId) { // Gist가 지워졌으면 이 기기의 기록으로 새로 만든다.
+        gistId = null;
+        syncAgain = true;
       } else {
         showNotice("지금은 동기화하지 못했습니다. 기록은 이 기기에 저장되어 있고 연결되면 다시 보냅니다.");
       }
@@ -733,7 +967,8 @@
   setInterval(check, 5000);
   setInterval(render, 30000);
   setInterval(() => { if (!document.hidden) sync(); }, POLL_MS);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { check(); sync(); } });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { check(); sync(); if (wakeWanted) keepAwake(true); } });
+  navigator.serviceWorker?.register("sw.js").catch(() => {});
 })();
 </script>
 </body>
