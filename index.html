@@ -215,6 +215,7 @@
       <div>
         <h2>할 일</h2>
         <div id="habitFields" style="display:grid;gap:8px"></div>
+        <button id="addHabit" type="button" style="margin-top:8px">할 일 추가</button>
         <p class="help">첫 단계는 하기 싫은 날에도 할 수 있을 만큼 작게 잡으세요.</p>
       </div>
       <div class="numbers">
@@ -237,6 +238,7 @@
       { id: "study", name: "공부", firstStep: "책 펴고 한 문단만 읽기" },
       { id: "exercise", name: "운동", firstStep: "운동복 입고 스쿼트 5개" },
       { id: "clean", name: "청소", firstStep: "눈에 보이는 물건 3개 제자리에 두기" },
+      { id: "meditate", name: "명상", firstStep: "자리에 앉아 눈 감고 숨 다섯 번 세기" },
     ],
   };
   const MINUTE = 60000, DAY_START_HOUR = 4, DAY_MS = 86400000;
@@ -477,7 +479,7 @@
       .filter(([day, e]) => day.startsWith(key.slice(0, 7)) && e[h.id]?.status === "done").length);
     $("legend").replaceChildren(...config.habits.map((h, i) => {
       const item = el("span");
-      item.append(el("i", `pip h${i} on`), `${h.name} ${counts[i]}일`);
+      item.append(el("i", `pip h${i % 3} on`), `${h.name} ${counts[i]}일`);
       return item;
     }));
     const cells = ["일", "월", "화", "수", "목", "금", "토"].map((d) => el("div", "dow", d));
@@ -488,7 +490,7 @@
       const dayId = `${year}-${pad(month)}-${pad(d)}`;
       const cell = el("div", `day${dayId === key ? " today" : ""}`, String(d));
       const pips = el("div", "pips");
-      config.habits.forEach((h, i) => pips.append(el("i", `pip h${i}${days[dayId]?.[h.id]?.status === "done" ? " on" : ""}`)));
+      config.habits.forEach((h, i) => pips.append(el("i", `pip h${i % 3}${days[dayId]?.[h.id]?.status === "done" ? " on" : ""}`)));
       cell.append(pips);
       cells.push(cell);
     }
@@ -498,26 +500,31 @@
     $("monthTitle").textContent = `${month}월 기록`;
   }
 
+  function habitRow(h) {
+    const row = el("div", "habit");
+    row.dataset.id = h.id;
+    [["name", h.name, "이름"], ["firstStep", h.firstStep, "첫 단계"]]
+      .forEach(([key, value, label]) => {
+        const input = el("input");
+        input.id = `${h.id}-${key}`;
+        input.type = "text";
+        input.value = value;
+        input.required = true;
+        input.dataset.key = key;
+        input.setAttribute("aria-label", `${h.name || "새 할 일"} ${label}`);
+        row.append(input);
+      });
+    return row;
+  }
   function fillSettings() {
-    const rows = config.habits.map((h) => {
-      const row = el("div", "habit");
-      row.dataset.id = h.id;
-      [["name", h.name, "이름"], ["firstStep", h.firstStep, "첫 단계"]]
-        .forEach(([key, value, label]) => {
-          const input = el("input");
-          input.id = `${h.id}-${key}`;
-          input.type = "text";
-          input.value = value;
-          input.required = true;
-          input.dataset.key = key;
-          input.setAttribute("aria-label", `${h.name} ${label}`);
-          row.append(input);
-        });
-      return row;
-    });
-    $("habitFields").replaceChildren(...rows);
+    $("habitFields").replaceChildren(...config.habits.map(habitRow));
     $("startMinutes").value = config.startMinutes;
   }
+  $("addHabit").addEventListener("click", () => {
+    const row = habitRow({ id: `h${Date.now().toString(36)}`, name: "", firstStep: "" });
+    $("habitFields").append(row);
+    row.querySelector("input").focus();
+  });
 
   function render() {
     const now = Date.now();
